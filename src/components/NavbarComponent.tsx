@@ -15,7 +15,9 @@ export default function NavbarComponent() {
                 <Toolbar>
                     <img src={'/favicon.ico'} alt="icon" width={25} style={{ marginRight: 10 }} />
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                        TechShop
+                        <Link href={'/'} style={{ textDecoration: 'none', color: 'white' }}>
+                            TechShop
+                        </Link>
                     </Typography>
                     <TextField
                         id="input-with-icon-textfield"

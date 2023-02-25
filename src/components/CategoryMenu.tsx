@@ -41,7 +41,7 @@ export default function CategoryMenuComponent() {
     };
 
     return (
-        <Container maxWidth={'md'} sx={{mt: 2}}>
+        <Container maxWidth={'md'} sx={{ mt: 2 }}>
             <Button
                 id="basic-button"
                 aria-controls={open ? 'basic-menu' : undefined}

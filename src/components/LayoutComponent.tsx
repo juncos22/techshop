@@ -16,8 +16,7 @@ export default function LayoutComponent({ children }: LayoutProps) {
                 <title>TechShop</title>
             </Head>
             <NavbarComponent />
-            <CategoryMenuComponent />
-            <Container maxWidth={'md'} sx={{ mt: 5 }}>
+            <Container maxWidth={'lg'} sx={{ mt: 5 }}>
                 {children}
             </Container>
         </>
