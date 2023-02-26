@@ -3,6 +3,7 @@ import { api } from '@/lib/axios'
 import { Product } from '@/models/product.model'
 import { Response } from '@/models/response.model'
 import { useProductStore } from '@/store/products'
+import getQuantities from '@/utils/quantity'
 import { AddShoppingCartRounded } from '@mui/icons-material'
 import { Alert, Button, Card, CardActions, CardContent, Container, FormControl, Grid, InputLabel, MenuItem, Select, Snackbar, Typography } from '@mui/material'
 import { GetServerSideProps } from 'next'
@@ -20,12 +21,14 @@ export default function ProductDetails({ res }: ProductDetailsProps) {
     const [open, setOpen] = useState(false)
 
     const handleCart = (product: Product) => {
-        productStore.addToCart({
-            product,
-            quantity,
-            subTotal: product.price * quantity
-        })
-        setOpen(true)
+        if (!productStore.productCart.find(pc => pc.product.name === product.name)) {
+            productStore.addToCart({
+                product,
+                quantity,
+                subTotal: product.price * quantity
+            })
+            setOpen(true)
+        }
     }
     return (
         <LayoutComponent>
@@ -35,9 +38,9 @@ export default function ProductDetails({ res }: ProductDetailsProps) {
                         alt={(res.data as Product).name}
                         width={'100%'}
                         height={'auto'} />
-                    <Typography variant='h3'>{(res.data as Product).name}</Typography>
-                    <Typography variant='body1'>{(res.data as Product).category.name}</Typography>
-                    <Typography variant='body2'>{(res.data as Product).description}</Typography>
+                    <Typography variant='h3' sx={{ color: 'green' }}>{(res.data as Product).name}</Typography>
+                    <Typography variant='h5'>Category: {(res.data as Product).category.name}</Typography>
+                    <Typography variant='body2' sx={{ mt: 5, fontStyle: 'italic', color: 'gray', fontSize: 18 }}>{(res.data as Product).description}</Typography>
                 </Grid>
                 <Grid item xs={4}>
                     <Card variant='outlined' sx={{ backgroundColor: 'black', borderColor: 'white', color: 'white' }}>
@@ -60,9 +63,12 @@ export default function ProductDetails({ res }: ProductDetailsProps) {
                                     labelId="demo-simple-select-label"
                                     id="demo-simple-select"
                                 >
-                                    <MenuItem value={1}>1</MenuItem>
-                                    <MenuItem value={2}>2</MenuItem>
-                                    <MenuItem value={3}>3</MenuItem>
+                                    {
+                                        getQuantities((res.data as Product).quantity)
+                                            .map(q => (
+                                                <MenuItem value={q} key={q}>{q}</MenuItem>
+                                            ))
+                                    }
                                 </Select>
                                 <Typography sx={{ fontSize: 20, mt: 2 }}>SubTotal: ${(res.data as Product).price * quantity}</Typography>
                                 <Button
@@ -86,7 +92,7 @@ export default function ProductDetails({ res }: ProductDetailsProps) {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const { id } = ctx.query
-    const res = await api.get<Response<Product>>(`/products/${id as string}`)
+    const res = await api.get<Response<Product>>(`/products/details/${id as string}`)
     return {
         props: {
             res: res.data

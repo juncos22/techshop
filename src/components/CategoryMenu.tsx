@@ -30,7 +30,10 @@ const categories = [
         name: 'Tablets'
     }
 ]
-export default function CategoryMenuComponent() {
+type CategoryMenuComponentProps = {
+    onSearchCategory: (categoryName: string) => void
+}
+export default function CategoryMenuComponent({ onSearchCategory }: CategoryMenuComponentProps) {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -38,6 +41,9 @@ export default function CategoryMenuComponent() {
     };
     const handleClose = () => {
         setAnchorEl(null);
+    }
+    const searchByCategory = (categoryName: string) => {
+        onSearchCategory(categoryName)
     };
 
     return (
@@ -48,6 +54,7 @@ export default function CategoryMenuComponent() {
                 aria-haspopup="true"
                 aria-expanded={open ? 'true' : undefined}
                 onClick={handleClick}
+                color={'success'}
             >
                 CATEGORIES
             </Button>
@@ -60,9 +67,10 @@ export default function CategoryMenuComponent() {
                     'aria-labelledby': 'basic-button',
                 }}
             >
+                <MenuItem onClick={() => searchByCategory("")}>Select Category</MenuItem>
                 {
                     categories.map((c, i) => (
-                        <MenuItem onClick={handleClose} key={i}>{c.name}</MenuItem>
+                        <MenuItem onClick={() => searchByCategory(c.name)} key={i}>{c.name}</MenuItem>
                     ))
                 }
             </Menu>

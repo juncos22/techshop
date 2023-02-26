@@ -14,7 +14,7 @@ type ProductStates = {
 }
 
 type ProductActions = {
-    loadProducts: () => void
+    loadProducts: (categoryName?: string, productName?: string) => void
     addToCart: (productCart: ProductCart) => void
     makePurchase: () => void
 }
@@ -32,11 +32,15 @@ export const useProductStore = create<ProductStates & ProductActions>(
                     name: ''
                 }
             },
-            async loadProducts() {
+            async loadProducts(categoryName, productName) {
                 set(state => ({
                     loading: true
                 }))
-                const res = await api.get<Response<Product[]>>('/products')
+                let params = ""
+                if (categoryName) params += `categoryName=${categoryName}&`
+                if (productName) params += `productName=${productName}&`
+
+                const res = await api.get<Response<Product>>(`/products?${params}`)
                 if (res.status !== 200) {
                     set(state => ({
                         loading: false,
@@ -51,9 +55,7 @@ export const useProductStore = create<ProductStates & ProductActions>(
             },
             addToCart(productCart) {
                 set(state => {
-                    if (!state.productCart.find(pc => pc.product.name === productCart.product.name)) {
-                        state.productCart = [...state.productCart, productCart]
-                    }
+                    state.productCart = [...state.productCart, productCart]
                     console.log(state.productCart);
                     return state
                 })

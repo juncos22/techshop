@@ -26,9 +26,6 @@ export default function ProductComponent({ product: { id, name, image, category,
                 <Typography variant="body2" color="text.secondary">
                     ${price}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    {description}
-                </Typography>
             </CardContent>
             <CardActions>
                 <Button size="small">

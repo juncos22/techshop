@@ -6,16 +6,17 @@ import CategoryMenuComponent from './CategoryMenu';
 import NavbarComponent from './NavbarComponent';
 
 type LayoutProps = {
-    children: ReactElement
+    children: ReactElement,
+    onFindProduct?: (productName: string) => void
 }
-export default function LayoutComponent({ children }: LayoutProps) {
+export default function LayoutComponent({ children, onFindProduct }: LayoutProps) {
 
     return (
         <>
             <Head>
                 <title>TechShop</title>
             </Head>
-            <NavbarComponent />
+            <NavbarComponent onFindProduct={onFindProduct!} />
             <Container maxWidth={'lg'} sx={{ mt: 5 }}>
                 {children}
             </Container>
