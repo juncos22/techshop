@@ -47,7 +47,7 @@ export default function CategoryMenuComponent({ onSearchCategory }: CategoryMenu
     };
 
     return (
-        <Container maxWidth={'md'} sx={{ mt: 2 }}>
+        <Container maxWidth={'lg'} sx={{ mt: 2 }}>
             <Button
                 id="basic-button"
                 aria-controls={open ? 'basic-menu' : undefined}
