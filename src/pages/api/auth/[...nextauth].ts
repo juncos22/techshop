@@ -1,9 +1,12 @@
-import { firebaseConfig } from "@/lib/firebaseConfig";
+import { auth, db, firebaseConfig } from "@/lib/firebaseConfig";
+import { userConverter } from "@/models/user.model";
 import { FirestoreAdapter } from "@next-auth/firebase-adapter";
-import NextAuth from "next-auth"
+import { signInWithCredential, signInWithEmailAndPassword } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import NextAuth, { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials";
 
-export default NextAuth({
+export const nextAuthOptions: NextAuthOptions = {
     providers: [
         CredentialsProvider({
             name: 'Credentials',
@@ -13,17 +16,31 @@ export default NextAuth({
             },
             async authorize(credentials, req) {
                 // Add logic here to look up the user from the credentials supplied
-                console.log(credentials);
+                console.log("Login data", credentials);
+                const ref = doc(db, 'users', credentials?.username!).withConverter(userConverter)
+                const docSnap = await getDoc(ref)
+                const user = docSnap.data()
+                if (user) {
+                    const userCredential = await signInWithEmailAndPassword(auth, user.email!, user.password!)
+                    console.log(userCredential);
+                    return {
+                        name: userCredential.user!.displayName,
+                        email: userCredential.user!.email,
+                        id: ""
+                    }
+                }
 
-                const user = { id: '1', name: "Roberto", email: "jsmith@example.com" }
-
-                if (user) return user
                 return null
             },
         })
     ],
     adapter: FirestoreAdapter(firebaseConfig),
     callbacks: {
+        signIn({ user, account, credentials }) {
+
+            console.log(user, account, credentials);
+            return true
+        },
         session({ session, token, user }) {
             console.log(session, token, user);
             return session // The return type will match the one returned in `useSession()`
@@ -33,4 +50,5 @@ export default NextAuth({
         signIn: "/auth/login",
         error: "/error",
     }
-})
+}
+export default NextAuth(nextAuthOptions)

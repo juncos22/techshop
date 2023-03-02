@@ -1,18 +1,24 @@
 import LoginLayoutComponent from '@/components/LoginLayoutComponent'
 import { User } from '@/models/user.model'
-import { Avatar, Box, Button, InputLabel, TextField, Typography } from '@mui/material'
+import { useAccountStore } from '@/store/account'
+import { Alert, Avatar, Box, Button, CircularProgress, InputLabel, TextField, Typography } from '@mui/material'
+import { GetServerSideProps } from 'next'
+import { getServerSession } from 'next-auth'
+import { getSession } from 'next-auth/react'
 import Link from 'next/link'
 import React, { ChangeEvent, FormEvent, useState } from 'react'
+import { nextAuthOptions } from '../api/auth/[...nextauth]'
 
 export default function LoginPage() {
     const [formData, setFormData] = useState<User>({
         name: '',
-        email: '',
         password: ''
     })
+    const accountStore = useAccountStore()
+
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        console.log(formData);
+        accountStore.signIn(formData.name, formData.password!)
     }
     const handleForm = (e: ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -55,10 +61,51 @@ export default function LoginPage() {
                     sx={{ my: 2, input: { color: 'white', border: 1, borderRadius: 1, borderColor: 'green', fontSize: 18 }, borderRadius: 1, color: 'white', borderColor: 'white' }}
                     size={'medium'} />
 
-                <Button color='success' type='submit' variant='contained' fullWidth size='large'>Login</Button>
+                {
+                    !accountStore.loading && (
+                        <Button color='success' type='submit' variant='contained' fullWidth size='large'>Login</Button>
+                    )
+                }
+                {
+                    accountStore.loading && (
+                        <CircularProgress size={30} color={'success'} />
+                    )
+                }
+                {
+                    accountStore.error && (
+                        <Alert color='error' variant='outlined'>{accountStore.error}</Alert>
+                    )
+                }
 
                 <Typography variant='body1' sx={{ mt: 2 }}>Doesn't have an account? <Link style={{ textDecoration: 'none', color: 'green', fontWeight: 'bold' }} href={'/auth/register'}>Register</Link></Typography>
             </Box>
         </LoginLayoutComponent>
     )
+}
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+    try {
+        const session = await getServerSession(ctx.req, ctx.res, nextAuthOptions)
+        console.log(session);
+
+        if (session) return {
+            redirect: {
+                destination: "/",
+                permanent: false
+            }
+        }
+    } catch (error: any) {
+        console.log(error.message);
+
+        return {
+            redirect: {
+                destination: "/error",
+                permanent: false,
+                statusCode: 500
+            }
+        }
+    }
+    return {
+        props: {}
+    }
 }
