@@ -1,8 +1,5 @@
-import { auth, db, firebaseConfig } from "@/lib/firebaseConfig";
-import { userConverter } from "@/models/user.model";
-import { FirestoreAdapter } from "@next-auth/firebase-adapter";
-import { signInWithCredential, signInWithEmailAndPassword } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/prisma";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import NextAuth, { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials";
 
@@ -17,24 +14,17 @@ export const nextAuthOptions: NextAuthOptions = {
             async authorize(credentials, req) {
                 // Add logic here to look up the user from the credentials supplied
                 console.log("Login data", credentials);
-                const ref = doc(db, 'users', credentials?.username!).withConverter(userConverter)
-                const docSnap = await getDoc(ref)
-                const user = docSnap.data()
-                if (user) {
-                    const userCredential = await signInWithEmailAndPassword(auth, user.email!, user.password!)
-                    console.log(userCredential);
-                    return {
-                        name: userCredential.user!.displayName,
-                        email: userCredential.user!.email,
-                        id: ""
+                const user = await db.user.findFirst({
+                    where: {
+                        username: credentials?.username,
+                        password: credentials?.password
                     }
-                }
-
-                return null
-            },
+                })
+                return user
+            }
         })
     ],
-    adapter: FirestoreAdapter(firebaseConfig),
+    adapter: PrismaAdapter(db),
     callbacks: {
         signIn({ user, account, credentials }) {
 
