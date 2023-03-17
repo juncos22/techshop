@@ -1,10 +1,10 @@
 import { api } from "@/lib/axios"
-import { db } from "@/lib/firebaseConfig"
 import { Response } from "@/models/response.model"
 import { User, userConverter } from "@/models/user.model"
 import { doc, getDoc, setDoc } from "firebase/firestore"
 import { create } from "zustand"
 import { signIn, signOut } from "next-auth/react";
+import { db } from "@/lib/prisma"
 
 type AccountStates = {
     user: User
@@ -33,7 +33,16 @@ export const useAccountStore = create<AccountStates & AccountActions>(
                         loading: true
                     }))
                     const data = await signIn("credentials", { username, password, redirect: false })
-                    console.log(data);
+                    if (!data?.ok) {
+                        set(state => ({
+                            error: 'Invalid credentials'
+                        }))
+                        setTimeout(() => {
+                            set(state => ({
+                                error: ""
+                            }))
+                        }, 2000);
+                    }
 
                 } catch (error: any) {
                     set(state => ({
@@ -55,8 +64,20 @@ export const useAccountStore = create<AccountStates & AccountActions>(
                     set(state => ({
                         loading: true
                     }))
-                    const ref = doc(db, 'users', user.name).withConverter(userConverter)
-                    await setDoc(ref, user)
+                    const res = await api.post<Response<User>>(`/account`, {
+                        username: user.name,
+                        email: user.email,
+                        password: user.password
+                    })
+                    if (res.data.status !== 200) {
+                        set(state => ({
+                            error: res.data.error
+                        }))
+                    } else {
+                        set(state => ({
+                            user: res.data.data as User
+                        }))
+                    }
                 } catch (error: any) {
                     set(state => ({
                         error: error.message
@@ -72,11 +93,16 @@ export const useAccountStore = create<AccountStates & AccountActions>(
                     set(state => ({
                         loading: true
                     }))
-                    const ref = doc(db, 'users', username).withConverter(userConverter)
-                    const docSnap = await getDoc(ref)
-                    set(state => ({
-                        user: docSnap.data()
-                    }))
+                    const res = await api.get<Response<User>>(`/account/${username}`)
+                    if (res.data.status !== 200) {
+                        set(state => ({
+                            error: res.data.error
+                        }))
+                    } else {
+                        set(state => ({
+                            user: res.data.data as User
+                        }))
+                    }
                 } catch (error: any) {
                     set(state => ({
                         error: error.message

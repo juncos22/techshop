@@ -1,22 +1,33 @@
 import LoginLayoutComponent from '@/components/LoginLayoutComponent'
 import { User } from '@/models/user.model'
-import { Box, Avatar, Typography, InputLabel, TextField, Button } from '@mui/material'
+import { useAccountStore } from '@/store/account'
+import { Box, Avatar, Typography, InputLabel, TextField, Button, Alert, CircularProgress, Container } from '@mui/material'
+import { GetServerSideProps } from 'next'
+import { getSession } from 'next-auth/react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import React, { ChangeEvent, FormEvent, useState } from 'react'
 
 export default function RegisterPage() {
+    const router = useRouter()
     const [formData, setFormData] = useState<User>({
         name: '',
         email: '',
         password: '',
     })
+    const accountStore = useAccountStore()
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        console.log(formData);
+        accountStore.signUp(formData)
+        if (!accountStore.error) {
+            router.push('/auth/login')
+        }
     }
     const handleForm = (e: ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
     }
+
+
     return (
         <LoginLayoutComponent>
             <Box onSubmit={handleSubmit} component={'form'} sx={{ border: 1, borderColor: 'green', color: 'white', borderRadius: 3, m: 'auto', px: 5, py: 3, my: 10 }}>
@@ -69,10 +80,53 @@ export default function RegisterPage() {
                     sx={{ my: 2, input: { color: 'white', border: 1, borderRadius: 1, borderColor: 'green', fontSize: 18 }, borderRadius: 1, color: 'white', borderColor: 'white' }}
                     size={'medium'} />
 
-                <Button color='success' type='submit' variant='contained' fullWidth size='large'>Register</Button>
+                {
+                    !accountStore.loading && (
+                        <Button color='success' type='submit' variant='contained' fullWidth size='large'>Register</Button>
+                    )
+                }
+                {
+                    accountStore.loading && (
+                        <Container maxWidth={'sm'} sx={{ m: 'auto', textAlign: 'center' }}>
+                            <CircularProgress size={30} color={'success'} />
+                        </Container>
+                    )
+                }
+                {
+                    accountStore.error && (
+                        <Alert color='error' sx={{ mt: 1 }} variant='outlined'>{accountStore.error}</Alert>
+                    )
+                }
 
                 <Typography variant='body1' sx={{ mt: 2 }}>Already have an account? <Link style={{ textDecoration: 'none', color: 'green', fontWeight: 'bold' }} href={'/auth/login'}>Login</Link></Typography>
             </Box>
         </LoginLayoutComponent>
     )
+}
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+    try {
+        const session = await getSession(ctx)
+        // console.log(session);
+
+        if (session) return {
+            redirect: {
+                destination: "/",
+                permanent: false
+            }
+        }
+    } catch (error: any) {
+        console.log(error);
+
+        return {
+            redirect: {
+                destination: "/error",
+                permanent: false,
+                statusCode: 500
+            }
+        }
+    }
+    return {
+        props: {}
+    }
 }

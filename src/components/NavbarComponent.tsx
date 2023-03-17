@@ -4,10 +4,13 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import { IconButton, InputAdornment, TextField } from '@mui/material';
+import { Avatar, Container, IconButton, InputAdornment, TextField } from '@mui/material';
 import { CloseRounded, SearchRounded } from '@mui/icons-material';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react';
+import { useAccountStore } from '@/store/account';
+import ProfileMenuComponent from './ProfileMenuComponent';
 
 type NavbarComponentProps = {
     onFindProduct: (productName: string) => void
@@ -15,6 +18,9 @@ type NavbarComponentProps = {
 export default function NavbarComponent({ onFindProduct }: NavbarComponentProps) {
     const [productName, setProductName] = React.useState("")
     const router = useRouter()
+    const session = useSession()
+
+
     return (
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position="static" sx={{ backgroundColor: 'green' }}>
@@ -29,7 +35,7 @@ export default function NavbarComponent({ onFindProduct }: NavbarComponentProps)
                         id="input-with-icon-textfield"
                         placeholder='Find the best products!'
                         fullWidth
-                        sx={{ mx: 3 }}
+                        sx={{ mx: 1 }}
                         name="productName"
                         disabled={router.pathname !== '/'}
                         value={productName}
@@ -59,12 +65,22 @@ export default function NavbarComponent({ onFindProduct }: NavbarComponentProps)
                         }}
                         variant="outlined"
                     />
-                    <Button color="inherit">
-                        <Link href={'/auth/login'} style={{ color: 'black', textDecoration: 'none' }}>
-                            Login
-                        </Link>
-                    </Button>
-
+                    {
+                        !session.data && (
+                            <Button color="inherit">
+                                <Link href={'/auth/login'} style={{ color: 'black', textDecoration: 'none' }}>
+                                    Login
+                                </Link>
+                            </Button>
+                        )
+                    }
+                    {
+                        session.data && (
+                            <Container maxWidth={'xs'} sx={{ textAlign: 'end' }} >
+                                <ProfileMenuComponent />
+                            </Container>
+                        )
+                    }
                 </Toolbar>
             </AppBar>
         </Box>

@@ -1,15 +1,15 @@
 import LoginLayoutComponent from '@/components/LoginLayoutComponent'
 import { User } from '@/models/user.model'
 import { useAccountStore } from '@/store/account'
-import { Alert, Avatar, Box, Button, CircularProgress, InputLabel, TextField, Typography } from '@mui/material'
+import { Alert, Avatar, Box, Button, CircularProgress, Container, InputLabel, TextField, Typography } from '@mui/material'
 import { GetServerSideProps } from 'next'
-import { getServerSession } from 'next-auth'
 import { getSession } from 'next-auth/react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import React, { ChangeEvent, FormEvent, useState } from 'react'
-import { nextAuthOptions } from '../api/auth/[...nextauth]'
 
 export default function LoginPage() {
+    const router = useRouter()
     const [formData, setFormData] = useState<User>({
         name: '',
         password: ''
@@ -19,6 +19,9 @@ export default function LoginPage() {
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         accountStore.signIn(formData.name, formData.password!)
+        if (!accountStore.error) {
+            router.push('/')
+        }
     }
     const handleForm = (e: ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -68,12 +71,14 @@ export default function LoginPage() {
                 }
                 {
                     accountStore.loading && (
-                        <CircularProgress size={30} color={'success'} />
+                        <Container maxWidth={'sm'} sx={{ m: 'auto', textAlign: 'center' }}>
+                            <CircularProgress size={30} color={'success'} />
+                        </Container>
                     )
                 }
                 {
                     accountStore.error && (
-                        <Alert color='error' variant='outlined'>{accountStore.error}</Alert>
+                        <Alert color='error' sx={{ mt: 1 }} variant='outlined'>{accountStore.error}</Alert>
                     )
                 }
 
@@ -85,8 +90,8 @@ export default function LoginPage() {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
     try {
-        const session = await getServerSession(ctx.req, ctx.res, nextAuthOptions)
-        console.log(session);
+        const session = await getSession(ctx)
+        // console.log(session);
 
         if (session) return {
             redirect: {
@@ -95,7 +100,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
             }
         }
     } catch (error: any) {
-        console.log(error.message);
+        console.log(error);
 
         return {
             redirect: {
