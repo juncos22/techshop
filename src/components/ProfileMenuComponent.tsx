@@ -1,5 +1,6 @@
 import { useAccountStore } from '@/store/account';
 import { Container, Button, Menu, MenuItem, IconButton, Avatar } from '@mui/material';
+import Link from 'next/link';
 import React from 'react'
 
 const menuItems = [
@@ -48,7 +49,14 @@ export default function ProfileMenuComponent() {
             >
                 {
                     menuItems.map((c, i) => {
-                        if (c.url) return <MenuItem key={i} href={c.url}>{c.name}</MenuItem>
+                        if (c.url) return (
+                            <MenuItem key={i}>
+                                <Link style={{ textDecoration: 'none', color: 'inherit' }} href={c.url!}>
+                                    {c.name}
+                                </Link>
+                            </MenuItem>
+                        )
+
                         return <MenuItem key={i} onClick={() => accountStore.signOut()}>{c.name}</MenuItem>
                     })
                 }

@@ -40,7 +40,6 @@ export const nextAuthOptions: NextAuthOptions = {
         //     return true
         // },
         session({ session, token, user }) {
-            console.log(session, token, user);
             return session // The return type will match the one returned in `useSession()`
         },
     },

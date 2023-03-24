@@ -11,6 +11,7 @@ import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
 import { useAccountStore } from '@/store/account';
 import ProfileMenuComponent from './ProfileMenuComponent';
+import { useProductStore } from '@/store/products';
 
 type NavbarComponentProps = {
     onFindProduct: (productName: string) => void
@@ -19,7 +20,7 @@ export default function NavbarComponent({ onFindProduct }: NavbarComponentProps)
     const [productName, setProductName] = React.useState("")
     const router = useRouter()
     const session = useSession()
-
+    const productStore = useProductStore()
 
     return (
         <Box sx={{ flexGrow: 1 }}>
@@ -55,7 +56,10 @@ export default function NavbarComponent({ onFindProduct }: NavbarComponentProps)
                                     }
                                     {
                                         productName && (
-                                            <IconButton onClick={() => setProductName("")}>
+                                            <IconButton onClick={() => {
+                                                setProductName("")
+                                                productStore.loadProducts()
+                                            }}>
                                                 <CloseRounded />
                                             </IconButton>
                                         )
