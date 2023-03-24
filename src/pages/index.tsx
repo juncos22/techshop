@@ -10,6 +10,7 @@ import { GetServerSideProps } from 'next'
 import React, { useEffect } from 'react'
 import ErrorPage from '@/pages/error'
 import CategoryMenuComponent from '@/components/CategoryMenu'
+import { getSession } from 'next-auth/react'
 
 // type ProductProps = {
 //   res: Response<Product[]>
@@ -55,12 +56,3 @@ export default function HomePage() {
     </LayoutComponent>
   )
 }
-
-// export const getServerSideProps: GetServerSideProps = async (ctx) => {
-//     const res = await api.get<Response<Product[]>>('/products')
-//     return {
-//         props: {
-//             res: res.data
-//         }
-//     }
-// }

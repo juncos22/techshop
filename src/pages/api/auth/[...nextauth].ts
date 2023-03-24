@@ -20,12 +20,11 @@ export const nextAuthOptions: NextAuthOptions = {
                         password: credentials?.password
                     }
                 })
-
                 if (!user) return null
                 return {
                     id: user?.id,
-                    email: user?.email,
-                    name: user.username
+                    name: user?.username,
+                    email: user?.email
                 }
             }
         })
@@ -39,7 +38,17 @@ export const nextAuthOptions: NextAuthOptions = {
         //     console.log("Signin data: ", user, account, credentials);
         //     return true
         // },
-        session({ session, token, user }) {
+        async session({ session, token, user }) {
+            console.log(session);
+
+            // const account = await db.user.findUnique({
+            //     where: {
+            //         id: session.user.id
+            //     }
+            // })
+            // console.log(account);
+
+            // session = { ...session, user: { ...session.user, id: user.id } }
             return session // The return type will match the one returned in `useSession()`
         },
     },

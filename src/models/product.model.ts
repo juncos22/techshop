@@ -7,7 +7,7 @@ export interface Product {
     quantity: number
     description: string
     image: string
-    category: Category
+    category?: Category
 }
 
 export interface Category {
@@ -22,7 +22,33 @@ export interface ProductCart {
 }
 
 export interface Cart {
-    productCart: ProductCart[]
+    productCarts: ProductCart[]
     total: number
     user: User
+}
+
+export function cartConverter(cart: any): Cart {
+    return {
+        productCarts: cart.productCarts !== null ? cart.productCarts?.map((pc: ProductCart) => (
+            {
+                product: {
+                    name: pc.product.name,
+                    description: pc.product.description,
+                    price: pc.product.price,
+                    quantity: pc.product.quantity,
+                    image: pc.product.image,
+                    id: pc.product.id
+                },
+                quantity: pc.quantity,
+                subTotal: pc.subTotal,
+            }
+        )) : [],
+        total: cart?.total!,
+        user: {
+            name: cart?.user.username!,
+            email: cart?.user.email,
+            password: cart?.user.password,
+            id: cart?.user.id
+        }
+    }
 }

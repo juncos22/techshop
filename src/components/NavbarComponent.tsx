@@ -81,7 +81,7 @@ export default function NavbarComponent({ onFindProduct }: NavbarComponentProps)
                     {
                         session.data && (
                             <Container maxWidth={'xs'} sx={{ textAlign: 'end' }} >
-                                <ProfileMenuComponent />
+                                <ProfileMenuComponent session={session.data} />
                             </Container>
                         )
                     }

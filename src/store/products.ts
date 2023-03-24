@@ -7,7 +7,7 @@ import { create } from "zustand"
 
 type ProductStates = {
     products: Product[]
-    productCart: ProductCart[]
+    productCarts: ProductCart[]
     cart: Cart
     loading: boolean
     error: string
@@ -24,9 +24,9 @@ export const useProductStore = create<ProductStates & ProductActions>(
             error: "",
             loading: false,
             products: [],
-            productCart: [],
+            productCarts: [],
             cart: {
-                productCart: [],
+                productCarts: [],
                 total: 0,
                 user: {
                     name: ''
@@ -55,16 +55,16 @@ export const useProductStore = create<ProductStates & ProductActions>(
             },
             addToCart(productCart) {
                 set(state => {
-                    state.productCart = [...state.productCart, productCart]
-                    console.log(state.productCart);
+                    state.productCarts = [...state.productCarts, productCart]
+                    console.log(state.productCarts);
                     return state
                 })
             },
             makePurchase() {
                 set(state => {
                     state.cart = {
-                        productCart: state.productCart,
-                        total: state.productCart.map(pc => pc.subTotal).reduce((acc, i) => acc + i),
+                        productCarts: state.productCarts,
+                        total: state.productCarts.map(pc => pc.subTotal).reduce((acc, i) => acc + i),
                         user: {
                             name: 'Roberto'
                         }
