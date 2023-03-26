@@ -12,10 +12,6 @@ const menuItems = [
         url: "/account",
     },
     {
-        name: "My Purchases",
-        url: "/account/purchases",
-    },
-    {
         name: "Logout",
     }
 ]

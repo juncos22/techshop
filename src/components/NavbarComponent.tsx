@@ -4,8 +4,8 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import { Avatar, Container, IconButton, InputAdornment, TextField } from '@mui/material';
-import { CloseRounded, SearchRounded } from '@mui/icons-material';
+import { Avatar, Badge, Chip, Container, IconButton, InputAdornment, TextField } from '@mui/material';
+import { CloseRounded, SearchRounded, ShoppingCart } from '@mui/icons-material';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
@@ -83,6 +83,17 @@ export default function NavbarComponent({ onFindProduct }: NavbarComponentProps)
                             <Container maxWidth={'xs'} sx={{ textAlign: 'end' }} >
                                 <ProfileMenuComponent session={session.data} />
                             </Container>
+                        )
+                    }
+                    {
+                        session.data && (
+                            <Link href={'/account/cart'}>
+                                <IconButton>
+                                    <Badge color='secondary' badgeContent={productStore.productCarts.length}>
+                                        <ShoppingCart color='action' />
+                                    </Badge>
+                                </IconButton>
+                            </Link>
                         )
                     }
                 </Toolbar>

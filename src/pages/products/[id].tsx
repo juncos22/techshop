@@ -21,7 +21,7 @@ export default function ProductDetails({ res }: ProductDetailsProps) {
     const [open, setOpen] = useState(false)
 
     const handleCart = (product: Product) => {
-        if (!productStore.productCart.find(pc => pc.product.name === product.name)) {
+        if (!productStore.productCarts.find(pc => pc.product.name === product.name)) {
             productStore.addToCart({
                 product,
                 quantity,
@@ -39,7 +39,7 @@ export default function ProductDetails({ res }: ProductDetailsProps) {
                         width={'100%'}
                         height={'auto'} />
                     <Typography variant='h3' sx={{ color: 'green' }}>{(res.data as Product).name}</Typography>
-                    <Typography variant='h5'>Category: {(res.data as Product).category.name}</Typography>
+                    <Typography variant='h5'>Category: {(res.data as Product).category?.name}</Typography>
                     <Typography variant='body2' sx={{ mt: 5, fontStyle: 'italic', color: 'gray', fontSize: 18 }}>{(res.data as Product).description}</Typography>
                 </Grid>
                 <Grid item xs={4}>
