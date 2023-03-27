@@ -7,6 +7,7 @@ import getQuantities from '@/utils/quantity'
 import { AddShoppingCartRounded } from '@mui/icons-material'
 import { Alert, Button, Card, CardActions, CardContent, Container, FormControl, Grid, InputLabel, MenuItem, Select, Snackbar, Typography } from '@mui/material'
 import { GetServerSideProps } from 'next'
+import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import React, { useState } from 'react'
 import ErrorPage from '../error'
@@ -19,6 +20,7 @@ export default function ProductDetails({ res }: ProductDetailsProps) {
     const [quantity, setQuantity] = useState(1)
     const productStore = useProductStore()
     const [open, setOpen] = useState(false)
+    const session = useSession()
 
     const handleCart = (product: Product) => {
         if (!productStore.productCarts.find(pc => pc.product.name === product.name)) {
@@ -26,7 +28,7 @@ export default function ProductDetails({ res }: ProductDetailsProps) {
                 product,
                 quantity,
                 subTotal: product.price * quantity
-            })
+            }, session.data?.user.name!)
             setOpen(true)
         }
     }

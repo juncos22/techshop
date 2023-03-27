@@ -1,12 +1,16 @@
 import { Product } from "@/models/product.model";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Response } from '@/models/response.model'
-import { products } from "@/tempdata/products";
+import { db } from "@/lib/prisma";
 
-export default function handler(req: NextApiRequest, res: NextApiResponse<Response<Product>>) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<Response<Product>>) {
     try {
         const { id } = req.query
-        const product = products.find(p => p.id === id as string)
+        const product = await db.product.findUnique({
+            where: {
+                id: id as string
+            }
+        })
         if (product) {
             switch (req.method) {
                 case 'GET':

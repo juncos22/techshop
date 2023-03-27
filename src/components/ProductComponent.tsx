@@ -11,7 +11,7 @@ import Link from 'next/link';
 type ProductProps = {
     product: Product
 }
-export default function ProductComponent({ product: { id, name, image, category, description, price } }: ProductProps) {
+export default function ProductComponent({ product: { id, name, image, category, price } }: ProductProps) {
     return (
         <Card sx={{ maxWidth: 345 }}>
             <CardMedia
@@ -21,18 +21,18 @@ export default function ProductComponent({ product: { id, name, image, category,
             />
             <CardContent>
                 <Typography gutterBottom variant="h5" component="div">
-                    {name} - {category.name}
+                    {name} - {category?.name}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                     ${price}
                 </Typography>
             </CardContent>
             <CardActions>
-                <Button size="small">
-                    <Link href={`/products/${id}`} style={{ textDecoration: 'none' }}>
+                <Link href={`/products/${id}`} style={{ textDecoration: 'none' }}>
+                    <Button size="small">
                         Details
-                    </Link>
-                </Button>
+                    </Button>
+                </Link>
             </CardActions>
         </Card>
     );

@@ -1,28 +1,20 @@
 import CarouselComponent from '@/components/CarouselComponent'
 import LayoutComponent from '@/components/LayoutComponent'
 import ProductComponent from '@/components/ProductComponent'
-import { api } from '@/lib/axios'
-import { Product } from '@/models/product.model'
-import { Response } from '@/models/response.model'
 import { useProductStore } from '@/store/products'
-import { CircularProgress, Container, Grid, Typography } from '@mui/material'
-import { GetServerSideProps } from 'next'
+import { CircularProgress, Container, Grid } from '@mui/material'
 import React, { useEffect } from 'react'
 import ErrorPage from '@/pages/error'
 import CategoryMenuComponent from '@/components/CategoryMenu'
-import { getSession } from 'next-auth/react'
 
 // type ProductProps = {
 //   res: Response<Product[]>
 // }
 export default function HomePage() {
   const productStore = useProductStore()
-
   useEffect(() => {
     productStore.loadProducts()
   }, [])
-
-  if (productStore.error) return <ErrorPage message={productStore.error} />
 
   const searchProductByCategory = (categoryName: string) => {
     if (categoryName) productStore.loadProducts(categoryName)
@@ -31,6 +23,8 @@ export default function HomePage() {
   const findProductByName = (productName: string) => {
     productStore.loadProducts(undefined, productName)
   }
+
+  if (productStore.error) return <ErrorPage message={productStore.error} />
   return (
     <LayoutComponent onFindProduct={findProductByName}>
       <>
@@ -43,10 +37,10 @@ export default function HomePage() {
             </Container>
           )
         }
-        <Grid alignItems={'center'} container spacing={{ xs: 4, md: 4 }} columns={{ xs: 4, sm: 4, md: 12 }}>
+        <Grid alignItems={'center'} container spacing={2} columns={{ xs: 2, sm: 12, md: 12, lg: 12 }}>
           {
             productStore.products.map(p => (
-              <Grid item xs={2} sm={2} md={4} key={p.id}>
+              <Grid item xs={6} md={4} lg={3} key={p.id}>
                 <ProductComponent product={p} />
               </Grid>
             ))

@@ -1,8 +1,6 @@
-import { SearchRounded } from '@mui/icons-material'
-import { AppBar, Box, Button, Container, InputAdornment, TextField, Toolbar, Typography } from '@mui/material'
+import { Container } from '@mui/material'
 import React, { ReactElement } from 'react'
 import Head from 'next/head';
-import CategoryMenuComponent from './CategoryMenu';
 import NavbarComponent from './NavbarComponent';
 
 type LayoutProps = {

@@ -5,6 +5,16 @@ export interface User {
     password?: string
 }
 
+export interface PaymentMethod {
+    id?: string
+    cardNumber: string
+    nameOnCard: string
+    cardCode: number
+    address: string
+    expireMonth: number
+    expireYear: number
+    userCard?: User
+}
 // Firestore data converter
 // export const userConverter = {
 //     toFirestore: (user: User) => {

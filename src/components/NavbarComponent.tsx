@@ -4,12 +4,11 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import { Avatar, Badge, Chip, Container, IconButton, InputAdornment, TextField } from '@mui/material';
+import { Badge, Container, IconButton, InputAdornment, TextField } from '@mui/material';
 import { CloseRounded, SearchRounded, ShoppingCart } from '@mui/icons-material';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
-import { useAccountStore } from '@/store/account';
 import ProfileMenuComponent from './ProfileMenuComponent';
 import { useProductStore } from '@/store/products';
 
@@ -70,7 +69,7 @@ export default function NavbarComponent({ onFindProduct }: NavbarComponentProps)
                         variant="outlined"
                     />
                     {
-                        !session.data && (
+                        session.status === 'unauthenticated' && (
                             <Button color="inherit">
                                 <Link href={'/auth/login'} style={{ color: 'black', textDecoration: 'none' }}>
                                     Login
@@ -79,21 +78,19 @@ export default function NavbarComponent({ onFindProduct }: NavbarComponentProps)
                         )
                     }
                     {
-                        session.data && (
-                            <Container maxWidth={'xs'} sx={{ textAlign: 'end' }} >
-                                <ProfileMenuComponent session={session.data} />
-                            </Container>
-                        )
-                    }
-                    {
-                        session.data && (
-                            <Link href={'/account/cart'}>
-                                <IconButton>
-                                    <Badge color='secondary' badgeContent={productStore.productCarts.length}>
-                                        <ShoppingCart color='action' />
-                                    </Badge>
-                                </IconButton>
-                            </Link>
+                        session.status === 'authenticated' && (
+                            <>
+                                <Container maxWidth={'xs'} sx={{ textAlign: 'end' }} >
+                                    <ProfileMenuComponent session={session.data} />
+                                </Container>
+                                <Link href={'/account/cart'}>
+                                    <IconButton>
+                                        <Badge color='secondary' badgeContent={productStore.productCarts.length}>
+                                            <ShoppingCart color='action' />
+                                        </Badge>
+                                    </IconButton>
+                                </Link>
+                            </>
                         )
                     }
                 </Toolbar>
