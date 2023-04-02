@@ -4,6 +4,22 @@ import NextAuth, { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials";
 
 export const nextAuthOptions: NextAuthOptions = {
+    secret: process.env.NEXTAUTH_SECRET,
+    logger: {
+        error(code, metadata) {
+            console.log("NEXTAUTH ERROR");
+            console.error(code, metadata);
+        },
+        warn(code) {
+            console.log("NEXTAUTH WARNING");
+            console.log(code);
+        },
+        debug(code, metadata) {
+            console.log("NEXTAUTH DEBUG");
+            console.error(code, metadata);
+        },
+    },
+    debug: process.env.NODE_ENV === 'development',
     providers: [
         CredentialsProvider({
             name: 'Credentials',
