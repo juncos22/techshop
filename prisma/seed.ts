@@ -1,4 +1,3 @@
-import { products } from "../src/tempdata/products";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient()
