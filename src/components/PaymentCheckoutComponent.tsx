@@ -8,8 +8,6 @@ import Typography from '@mui/material/Typography';
 import { FormControl, InputLabel, Select, MenuItem, Container, CircularProgress, SelectChangeEvent, Alert } from '@mui/material';
 import { useProductStore } from '@/store/products';
 import { useCartStore } from '@/store/productCart';
-import { api } from '@/lib/axios';
-import { loadStripe } from '@stripe/stripe-js';
 
 const steps = ['Confirm or Add Payment Method', 'Confirm Checkout'];
 
@@ -58,8 +56,8 @@ function PaymentMethod({ username, onSelectPayment, paymentMethod }: PaymenCheck
                                     onChange={onSelectPayment}
                                 >
                                     {
-                                        productStore.paymentMethods.map(pm => (
-                                            <MenuItem value={pm.id!} key={pm.id}>
+                                        productStore.paymentMethods.map((pm, i) => (
+                                            <MenuItem value={pm.id!} key={i}>
                                                 {pm.cardNumber}
                                             </MenuItem>
                                         ))
