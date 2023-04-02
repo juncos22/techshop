@@ -97,7 +97,14 @@ export default function PaymentCheckout({ username }: PaymenCheckoutProps) {
         setPaymentMethod(e.target.value)
     }
 
-    const fragments = [<PaymentMethod paymentMethod={paymentMethod} onSelectPayment={onSelectPaymentMethod} username={username} />, <PaymentDetails paymentMethod={paymentMethod} username={username} />]
+    const fragments = [
+        <PaymentMethod paymentMethod={paymentMethod}
+            onSelectPayment={onSelectPaymentMethod}
+            username={username} />,
+        <PaymentDetails
+            paymentMethod={paymentMethod}
+            username={username} />
+    ]
 
     const finishCheckOut = async () => {
         // console.log(cartStore.cart);
@@ -120,10 +127,6 @@ export default function PaymentCheckout({ username }: PaymenCheckoutProps) {
         <Box sx={style}>
             <Stepper activeStep={activeStep}>
                 {steps.map((label, i) => {
-                    // const stepProps: { completed?: boolean } = {};
-                    // const labelProps: {
-                    //     optional?: React.ReactNode;
-                    // } = {};
                     return (
                         <Step key={i}>
                             <StepLabel>{label}</StepLabel>
