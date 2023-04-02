@@ -2,9 +2,16 @@ import { db } from "@/lib/prisma";
 import { Response } from "@/models/response.model";
 import { User } from "@/models/user.model";
 import { NextApiRequest, NextApiResponse } from "next";
+import NextCors from "nextjs-cors";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Response<User>>) {
     try {
+        await NextCors(req, res, {
+            // Options
+            methods: ['GET', 'PUT', 'POST'],
+            origin: process.env.NEXTAUTH_URL,
+            optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+        });
         const { id, name } = req.query
         const { email, username, password } = req.body
 

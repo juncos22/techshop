@@ -2,9 +2,16 @@ import { Product } from "@/models/product.model";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Response } from '@/models/response.model'
 import { db } from "@/lib/prisma";
+import NextCors from "nextjs-cors";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Response<Product>>) {
     try {
+        await NextCors(req, res, {
+            // Options
+            methods: ['GET', 'PUT'],
+            origin: process.env.NEXTAUTH_URL,
+            optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+        });
         const { id } = req.query
         const product = await db.product.findUnique({
             where: {

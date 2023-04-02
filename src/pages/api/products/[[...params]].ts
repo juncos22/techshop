@@ -2,9 +2,16 @@ import { db } from "@/lib/prisma";
 import { Product } from "@/models/product.model";
 import { Response } from "@/models/response.model";
 import { NextApiRequest, NextApiResponse } from "next";
+import NextCors from "nextjs-cors";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Response<Product>>) {
     try {
+        await NextCors(req, res, {
+            // Options
+            methods: ['GET'],
+            origin: process.env.NEXTAUTH_URL,
+            optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+        });
         const { categoryName, productName } = req.query
         console.log(categoryName, productName);
 
