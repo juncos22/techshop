@@ -6,26 +6,35 @@ import { NextApiRequest, NextApiResponse } from "next";
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Response<Product>>) {
     try {
         const { categoryName, productName } = req.query
+        console.log(categoryName, productName);
+
         const filterOptions = []
-        let options = {}
+        let options = {
+            include: {
+                category: true
+            }
+        }
         if (categoryName) {
             filterOptions.push({
                 category: {
                     name: {
-                        contains: (categoryName as string).toLowerCase()
+                        contains: (categoryName as string)[0].toUpperCase() + (categoryName as string).slice(1)
                     }
                 }
             })
         }
         if (productName) {
             filterOptions.push({
-                name: (productName as string).toLowerCase()
+                name: {
+                    contains: (productName as string)[0].toUpperCase() + (productName as string).slice(1)
+                }
             })
         }
         if (filterOptions.length) {
             options = {
+                ...options,
                 where: {
-                    AND: filterOptions
+                    OR: filterOptions
                 }
             }
         }

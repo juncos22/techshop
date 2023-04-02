@@ -11,6 +11,7 @@ import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
 import ProfileMenuComponent from './ProfileMenuComponent';
 import { useProductStore } from '@/store/products';
+import { useCartStore } from '@/store/productCart';
 
 type NavbarComponentProps = {
     onFindProduct: (productName: string) => void
@@ -20,6 +21,7 @@ export default function NavbarComponent({ onFindProduct }: NavbarComponentProps)
     const router = useRouter()
     const session = useSession()
     const productStore = useProductStore()
+    const cartStore = useCartStore()
 
     return (
         <Box sx={{ flexGrow: 1 }}>
@@ -85,7 +87,7 @@ export default function NavbarComponent({ onFindProduct }: NavbarComponentProps)
                                 </Container>
                                 <Link href={'/account/cart'}>
                                     <IconButton>
-                                        <Badge color='secondary' badgeContent={productStore.productCarts.length}>
+                                        <Badge color='secondary' badgeContent={cartStore.productCarts.length}>
                                             <ShoppingCart color='action' />
                                         </Badge>
                                     </IconButton>

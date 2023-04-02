@@ -2,15 +2,14 @@ import LayoutComponent from '@/components/LayoutComponent'
 import { api } from '@/lib/axios'
 import { Product } from '@/models/product.model'
 import { Response } from '@/models/response.model'
-import { useProductStore } from '@/store/products'
 import getQuantities from '@/utils/quantity'
 import { AddShoppingCartRounded } from '@mui/icons-material'
-import { Alert, Button, Card, CardActions, CardContent, Container, FormControl, Grid, InputLabel, MenuItem, Select, Snackbar, Typography } from '@mui/material'
+import { Alert, Button, Card, CardActions, CardContent, Grid, MenuItem, Select, Snackbar, Typography } from '@mui/material'
 import { GetServerSideProps } from 'next'
 import { useSession } from 'next-auth/react'
-import Image from 'next/image'
 import React, { useState } from 'react'
 import ErrorPage from '../error'
+import { useCartStore } from '@/store/productCart'
 
 type ProductDetailsProps = {
     res: Response<Product>
@@ -18,16 +17,16 @@ type ProductDetailsProps = {
 export default function ProductDetails({ res }: ProductDetailsProps) {
     if (res.status !== 200) return <ErrorPage message={res.error!} />
     const [quantity, setQuantity] = useState(1)
-    const productStore = useProductStore()
+    const cartStore = useCartStore()
     const [open, setOpen] = useState(false)
     const session = useSession()
 
     const handleCart = (product: Product) => {
-        if (!productStore.productCarts.find(pc => pc.product.name === product.name)) {
-            productStore.addToCart({
+        if (!cartStore.productCarts.find(pc => pc.product.name === product.name)) {
+            cartStore.addToCart({
                 product,
                 quantity,
-                subTotal: product.price * quantity
+                subtotal: product.price * quantity
             }, session.data?.user.name!)
             setOpen(true)
         }

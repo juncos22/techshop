@@ -7,11 +7,9 @@ import React, { useEffect } from 'react'
 import ErrorPage from '@/pages/error'
 import CategoryMenuComponent from '@/components/CategoryMenu'
 
-// type ProductProps = {
-//   res: Response<Product[]>
-// }
 export default function HomePage() {
   const productStore = useProductStore()
+
   useEffect(() => {
     productStore.loadProducts()
   }, [])

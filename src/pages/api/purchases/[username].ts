@@ -6,10 +6,9 @@ import { NextApiRequest, NextApiResponse } from "next";
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Response<Cart>>) {
     try {
         const { username } = req.query
-        console.log(username);
 
         if (req.method === 'GET') {
-            const userCart = await db.cart.findFirst({
+            const userCarts = await db.cart.findMany({
                 include: {
                     productCarts: {
                         include: {
@@ -24,11 +23,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                     }
                 }
             })
-            if (!userCart) return res.json({ status: 404 })
+
+            console.log(userCarts);
 
             return res.json({
                 status: 200,
-                data: cartConverter(userCart) as Cart
+                data: userCarts.map(uc => cartConverter(uc) as Cart) as Cart[]
             })
         } else {
             return res.json({

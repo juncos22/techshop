@@ -21,7 +21,7 @@ export default function ProductComponent({ product: { id, name, image, category,
             />
             <CardContent>
                 <Typography gutterBottom variant="h5" component="div">
-                    {name} - {category?.name}
+                    {name} - {category!.name}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                     ${price}

@@ -32,7 +32,7 @@ export default function ProfileMenuComponent({ session }: ProfileMenuComponentPr
     return (
         <Grid container spacing={2} sx={{ ml: 'auto' }}>
             <Grid item xs={8}>
-                <Typography variant='subtitle1' sx={{ my: 2, ml: 'auto', width: 'fit-content' }} color={'inherit'}>Bienvenido/a <strong>{session?.user.name}</strong></Typography>
+                <Typography variant='subtitle1' sx={{ my: 2, ml: 'auto', width: 'fit-content' }} color={'inherit'}>Welcome <strong>{session?.user.name}</strong>!</Typography>
             </Grid>
             <Grid item xs={3}>
                 <IconButton id="basic-button"

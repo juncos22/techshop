@@ -2,6 +2,7 @@ import LayoutComponent from '@/components/LayoutComponent'
 import PaymentCheckout from '@/components/PaymentCheckoutComponent'
 import ProductCartComponent from '@/components/ProductCartComponent'
 import { ProductCart } from '@/models/product.model'
+import { useCartStore } from '@/store/productCart'
 import { useProductStore } from '@/store/products'
 import { ShoppingCartCheckout } from '@mui/icons-material'
 import { Alert, Fab, Grid, Modal, Slide, Typography, useScrollTrigger } from '@mui/material'
@@ -13,10 +14,10 @@ type AccountCartProps = {
     username: string
 }
 export default function AccountCart({ username }: AccountCartProps) {
-    const productStore = useProductStore()
+
+    const cartStore = useCartStore()
     const deleteProduct = (productCart: ProductCart) => {
-        productStore.deleteFromCart(productCart)
-        productStore.loadProducts()
+        cartStore.deleteFromCart(productCart)
     }
     const trigger = useScrollTrigger()
     const [open, setOpen] = React.useState(false);
@@ -30,7 +31,7 @@ export default function AccountCart({ username }: AccountCartProps) {
                 <Typography variant='h3'>My Cart</Typography>
                 <hr />
                 {
-                    productStore.productCarts.length === 0 && (
+                    cartStore.productCarts.length === 0 && (
                         <Alert variant='outlined' color='info'>
                             There is not products in your cart.
                         </Alert>
@@ -39,7 +40,7 @@ export default function AccountCart({ username }: AccountCartProps) {
                 <Slide in={!trigger}>
                     <Grid container spacing={1} columns={{ xs: 2, sm: 12, md: 12, lg: 12 }}>
                         {
-                            productStore.productCarts.map((pc, i) => (
+                            cartStore.productCarts.map((pc, i) => (
                                 <Grid item xs={6} key={i}>
                                     <ProductCartComponent productCart={pc} onDeleteProduct={deleteProduct} />
                                 </Grid>
@@ -48,7 +49,7 @@ export default function AccountCart({ username }: AccountCartProps) {
                     </Grid>
                 </Slide>
                 {
-                    productStore.productCarts.length !== 0 && (
+                    cartStore.productCarts.length !== 0 && (
                         <Fab onClick={handleOpen} variant='extended' color='success' sx={{ position: 'absolute', right: 15, bottom: 15 }}>
                             <ShoppingCartCheckout sx={{ mr: 1 }} />
                             Complete Purchase
@@ -62,7 +63,7 @@ export default function AccountCart({ username }: AccountCartProps) {
                             open={open}
                             onClose={handleClose}>
 
-                            <PaymentCheckout username={username} />
+                            <PaymentCheckout paymentMethod='' username={username} />
                         </Modal>
                     )
                 }

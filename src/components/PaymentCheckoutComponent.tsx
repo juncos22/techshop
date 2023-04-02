@@ -5,9 +5,11 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { FormControl, InputLabel, Select, MenuItem, Container, CircularProgress, SelectChangeEvent } from '@mui/material';
+import { FormControl, InputLabel, Select, MenuItem, Container, CircularProgress, SelectChangeEvent, Alert } from '@mui/material';
 import { useProductStore } from '@/store/products';
-import { useAccountStore } from '@/store/account';
+import { useCartStore } from '@/store/productCart';
+import { api } from '@/lib/axios';
+import { loadStripe } from '@stripe/stripe-js';
 
 const steps = ['Confirm or Add Payment Method', 'Confirm Checkout'];
 
@@ -24,7 +26,7 @@ const style = {
 };
 type PaymenCheckoutProps = {
     username: string
-    paymentMethod?: string
+    paymentMethod: string
     onSelectPayment?: (e: SelectChangeEvent<string>) => void
 }
 
@@ -71,29 +73,38 @@ function PaymentMethod({ username, onSelectPayment, paymentMethod }: PaymenCheck
     )
 }
 function PaymentDetails({ username }: PaymenCheckoutProps) {
-    const productStore = useProductStore()
+    const cartStore = useCartStore()
 
     return (
         <React.Fragment>
             {
-                productStore.productCarts.map((pc, i) => (
-                    <Typography key={i} sx={{ color: 'black' }} variant='h6'>{pc.product.name} - ${pc.subTotal}</Typography>
+                cartStore.cart.productCarts.map((pc, i) => (
+                    <Typography key={i} sx={{ color: 'black' }} variant='h6'>{pc.product.name} - ${pc.subtotal}</Typography>
                 ))
             }
-
+            {
+                <Typography variant='h6' sx={{ color: 'black' }}>Total: ${cartStore.cart.total}</Typography>
+            }
         </React.Fragment>
     )
 }
 
+
+
 export default function PaymentCheckout({ username }: PaymenCheckoutProps) {
     const [activeStep, setActiveStep] = React.useState(0);
     const [paymentMethod, setPaymentMethod] = React.useState("")
+    const cartStore = useCartStore()
     const onSelectPaymentMethod = (e: SelectChangeEvent<string>) => {
         setPaymentMethod(e.target.value)
     }
 
-    const fragments = [<PaymentMethod onSelectPayment={onSelectPaymentMethod} username={username} />, <PaymentDetails username={username} />]
+    const fragments = [<PaymentMethod paymentMethod={paymentMethod} onSelectPayment={onSelectPaymentMethod} username={username} />, <PaymentDetails paymentMethod={paymentMethod} username={username} />]
 
+    const finishCheckOut = async () => {
+        // console.log(cartStore.cart);
+        cartStore.makePurchase(cartStore.cart)
+    }
     const handleNext = () => {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
     };
@@ -140,16 +151,25 @@ export default function PaymentCheckout({ username }: PaymenCheckoutProps) {
                     <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
                         <Button
                             color="primary"
-                            disabled={activeStep === 0}
+                            disabled={activeStep === 0 || cartStore.loading}
                             onClick={handleBack}
                             sx={{ mr: 1 }}
                         >
                             Back
                         </Button>
                         <Box sx={{ flex: '1 1 auto' }} />
-                        <Button onClick={handleNext} disabled={!paymentMethod}>
-                            {activeStep === steps.length - 1 ? 'Finish Checkout' : 'Next'}
-                        </Button>
+                        {
+                            cartStore.error && <Alert color='error'>{cartStore.error}</Alert>
+                        }
+                        {
+                            cartStore.loading ? (
+                                <CircularProgress size={30} color='info' />
+                            ) : (
+                                <Button onClick={activeStep === steps.length - 1 ? finishCheckOut : handleNext} disabled={!paymentMethod}>
+                                    {activeStep === steps.length - 1 ? 'Finish Checkout' : 'Next'}
+                                </Button>
+                            )
+                        }
                     </Box>
                 </React.Fragment>
             )}

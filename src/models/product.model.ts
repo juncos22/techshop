@@ -1,7 +1,7 @@
 import { User } from "./user.model"
 
 export interface Product {
-    id: string
+    id?: string
     name: string
     price: number
     quantity: number
@@ -18,10 +18,11 @@ export interface Category {
 export interface ProductCart {
     product: Product
     quantity: number
-    subTotal: number
+    subtotal: number
 }
 
 export interface Cart {
+    id?: string
     productCarts: ProductCart[]
     total: number
     user: User
@@ -40,7 +41,7 @@ export function cartConverter(cart: any): Cart {
                     id: pc.product.id
                 },
                 quantity: pc.quantity,
-                subTotal: pc.subTotal,
+                subtotal: pc.subtotal,
             }
         )) : [],
         total: cart?.total!,

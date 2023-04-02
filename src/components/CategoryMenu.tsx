@@ -3,39 +3,16 @@ import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { Container } from '@mui/system';
+import { useCategoryStore } from '@/store/categories';
 
-const categories = [
-    {
-        name: 'Laptops'
-    },
-    {
-        name: 'PC Gamer'
-    },
-    {
-        name: 'Accessories'
-    },
-    {
-        name: 'Network'
-    },
-    {
-        name: 'Mobile'
-    },
-    {
-        name: 'Printers'
-    },
-    {
-        name: 'Video Cards'
-    },
-    {
-        name: 'Tablets'
-    }
-]
 type CategoryMenuComponentProps = {
     onSearchCategory: (categoryName: string) => void
 }
 export default function CategoryMenuComponent({ onSearchCategory }: CategoryMenuComponentProps) {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
+    const categoryStore = useCategoryStore()
+
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
     };
@@ -45,6 +22,10 @@ export default function CategoryMenuComponent({ onSearchCategory }: CategoryMenu
     const searchByCategory = (categoryName: string) => {
         onSearchCategory(categoryName)
     };
+
+    React.useEffect(() => {
+        categoryStore.loadCategories()
+    }, [])
 
     return (
         <Container maxWidth={'lg'} sx={{ mt: 2 }}>
@@ -67,9 +48,9 @@ export default function CategoryMenuComponent({ onSearchCategory }: CategoryMenu
                     'aria-labelledby': 'basic-button',
                 }}
             >
-                <MenuItem onClick={() => searchByCategory("")}>Select Category</MenuItem>
+                <MenuItem onClick={() => searchByCategory("")}>All</MenuItem>
                 {
-                    categories.map((c, i) => (
+                    categoryStore.categories.map((c, i) => (
                         <MenuItem onClick={() => searchByCategory(c.name)} key={i}>{c.name}</MenuItem>
                     ))
                 }

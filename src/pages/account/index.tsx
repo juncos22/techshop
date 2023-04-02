@@ -4,11 +4,15 @@ import { Cart } from '@/models/product.model'
 import { Response } from '@/models/response.model'
 import { User } from '@/models/user.model'
 import { useAccountStore } from '@/store/account'
-import { Alert, Button, CircularProgress, Container, Grid, Link, TextField, Typography } from '@mui/material'
+import { Accordion, AccordionDetails, AccordionSummary, Alert, Button, CircularProgress, Container, Grid, Link, TextField, Typography } from '@mui/material'
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/react'
 import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import ErrorPage from '../error'
+import ProductCartComponent from '@/components/ProductCartComponent'
+import ProductComponent from '@/components/ProductComponent'
+import PurchasedProductComponent from '@/components/PurchasedProductComponent'
+import { ExpandMore } from '@mui/icons-material'
 
 type ProfileProps = {
     username: string
@@ -88,22 +92,39 @@ export default function ProfileAccount({ username, res }: ProfileProps) {
                                     <Button fullWidth size='large' variant='contained' color='info'>Back to home</Button>
                                 </Link>
                             </Grid>
-                            <Grid item xs={6}>
-
-                            </Grid>
+                            <Grid item xs={6}></Grid>
                         </Grid>
                         <hr />
                         <Typography variant='h4'>My Purchases</Typography>
                         <Container maxWidth={'md'}>
                             {
-                                res.data && (res.data as Cart).productCarts?.map(pc => (
-                                    <Typography variant='body1'>{pc.product.name} - {pc.quantity} units. ${pc.subTotal}</Typography>
+                                res.data && (res.data as Cart[]).map((c, i) => (
+                                    <Accordion sx={{ mt: 2, color: 'green', border: 1 }} key={i} TransitionProps={{ unmountOnExit: true }}>
+                                        <AccordionSummary
+                                            expandIcon={<ExpandMore />}
+                                            aria-controls="panel1a-content"
+                                            id="panel1a-header"
+                                        >
+                                            <Typography>TOTAL PURCHASED: ${c.total}</Typography>
+                                        </AccordionSummary>
+                                        <AccordionDetails>
+                                            {
+                                                c.productCarts.map((pc, i) => (
+                                                    <PurchasedProductComponent
+                                                        key={i}
+                                                        productCart={pc} />
+                                                ))
+                                            }
+                                        </AccordionDetails>
+                                    </Accordion>
                                 ))
                             }
                             {
-                                res.status === 404 && <Alert sx={{ mt: 3 }} variant='outlined' color='info'>
-                                    You are not purchased any products
-                                </Alert>
+                                res.status === 404 && (
+                                    <Alert sx={{ mt: 3 }} variant='outlined' color='info'>
+                                        You are not purchased any products
+                                    </Alert>
+                                )
                             }
                         </Container>
                     </>
