@@ -98,10 +98,10 @@ export default function PaymentCheckout({ username }: PaymenCheckoutProps) {
     }
 
     const fragments = [
-        <PaymentMethod paymentMethod={paymentMethod}
+        <PaymentMethod key={1} paymentMethod={paymentMethod}
             onSelectPayment={onSelectPaymentMethod}
             username={username} />,
-        <PaymentDetails
+        <PaymentDetails key={2}
             paymentMethod={paymentMethod}
             username={username} />
     ]
