@@ -82,7 +82,7 @@ export default function LoginPage() {
                     )
                 }
 
-                <Typography variant='body1' sx={{ mt: 2 }}>Doesn't have an account? <Link style={{ textDecoration: 'none', color: 'green', fontWeight: 'bold' }} href={'/auth/register'}>Register</Link></Typography>
+                <Typography variant='body1' sx={{ mt: 2 }}>Doesn&apos;t have an account? <Link style={{ textDecoration: 'none', color: 'green', fontWeight: 'bold' }} href={'/auth/register'}>Register</Link></Typography>
             </Box>
         </LoginLayoutComponent>
     )

@@ -15,7 +15,6 @@ type ProductDetailsProps = {
     res: Response<Product>
 }
 export default function ProductDetails({ res }: ProductDetailsProps) {
-    if (res.status !== 200) return <ErrorPage message={res.error!} />
     const [quantity, setQuantity] = useState(1)
     const cartStore = useCartStore()
     const [open, setOpen] = useState(false)
@@ -31,6 +30,7 @@ export default function ProductDetails({ res }: ProductDetailsProps) {
             setOpen(true)
         }
     }
+    if (res.status !== 200) return <ErrorPage message={res.error!} />
     return (
         <LayoutComponent>
             <Grid container spacing={1}>
