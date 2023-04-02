@@ -15,7 +15,7 @@ export default function ProductCartComponent({ productCart, onDeleteProduct }: P
                 <Grid item xs={10}>
                     <CardContent>
                         <Typography variant='h6'>{productCart.product.name}</Typography>
-                        <Typography variant='body1'>{productCart.quantity} units. - ${productCart.subTotal}</Typography>
+                        <Typography variant='body1'>{productCart.quantity} units. - ${productCart.subtotal}</Typography>
                     </CardContent>
                 </Grid>
                 <Grid item xs={2} sx={{ my: 'auto', right: 0 }}>
