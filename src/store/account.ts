@@ -31,18 +31,7 @@ export const useAccountStore = create<AccountStates & AccountActions>(
                     set(state => ({
                         loading: true
                     }))
-                    const data = await signIn("credentials", { username, password, redirect: false })
-                    if (!data?.ok) {
-                        set(state => ({
-                            error: 'Invalid credentials'
-                        }))
-                        setTimeout(() => {
-                            set(state => ({
-                                error: ""
-                            }))
-                        }, 2000);
-                    }
-
+                    await signIn("credentials", { username, password })
                 } catch (error: any) {
                     set(state => ({
                         error: error.message

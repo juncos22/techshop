@@ -6,7 +6,7 @@ import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { ChangeEvent, FormEvent, useState } from 'react'
+import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 
 export default function LoginPage() {
     const router = useRouter()
@@ -15,13 +15,21 @@ export default function LoginPage() {
         password: ''
     })
     const accountStore = useAccountStore()
+    const { error } = router.query
+    const [errorMessage, setErrorMessage] = useState("")
 
+    useEffect(() => {
+        if (error) {
+            setErrorMessage((_) => "Invalid Credentials")
+            setTimeout(() => {
+                setErrorMessage((_) => "")
+            }, 3000);
+        }
+    }, [error])
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         accountStore.signIn(formData.name, formData.password!)
-        if (!accountStore.error) {
-            router.push('/')
-        }
+        console.log(accountStore.error);
     }
     const handleForm = (e: ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -77,8 +85,8 @@ export default function LoginPage() {
                     )
                 }
                 {
-                    accountStore.error && (
-                        <Alert color='error' sx={{ mt: 1 }} variant='outlined'>{accountStore.error}</Alert>
+                    errorMessage && (
+                        <Alert color='error' sx={{ mt: 1 }} variant='outlined'>{errorMessage}</Alert>
                     )
                 }
 
