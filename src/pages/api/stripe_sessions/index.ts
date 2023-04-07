@@ -58,7 +58,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const createdCart = await db.cart.create({
                 data: {
                     total: cart.total,
-                    userId: cart.user.id!,
+                    userId: cart.user?.id!,
                     productCarts: {
                         createMany: {
                             data: cart.productCarts.map(pc => ({
