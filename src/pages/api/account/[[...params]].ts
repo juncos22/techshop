@@ -18,6 +18,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         switch (req.method) {
             case 'GET':
                 const account = await db.user.findFirst({
+                    include: {
+                        carts: {
+                            include: {
+                                productCarts: {
+                                    include: {
+                                        product: true
+                                    }
+                                }
+                            }
+                        }
+                    },
                     where: {
                         username: name as string,
                     }
@@ -28,7 +39,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                         id: account?.id,
                         name: account?.username!,
                         email: account?.email!,
-                        password: account?.password!
+                        password: account?.password!,
+                        carts: account?.carts.map(c => ({
+                            productCarts: c.productCarts,
+                            total: c.total
+                        }))
                     }
                 })
             case 'POST':

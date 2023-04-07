@@ -6,7 +6,7 @@ import { User } from '@/models/user.model'
 import { useAccountStore } from '@/store/account'
 import { Accordion, AccordionDetails, AccordionSummary, Alert, Button, CircularProgress, Container, Grid, Link, TextField, Typography } from '@mui/material'
 import { GetServerSideProps } from 'next'
-import { getSession } from 'next-auth/react'
+import { getSession, useSession } from 'next-auth/react'
 import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import ErrorPage from '../error'
 import ProductCartComponent from '@/components/ProductCartComponent'
@@ -14,19 +14,18 @@ import ProductComponent from '@/components/ProductComponent'
 import PurchasedProductComponent from '@/components/PurchasedProductComponent'
 import { ExpandMore } from '@mui/icons-material'
 
-type ProfileProps = {
-    username: string
-    res: Response<Cart>
-}
-export default function ProfileAccount({ username, res }: ProfileProps) {
+export default function ProfileAccount() {
     const accountStore = useAccountStore()
     const [changedUser, setChangedUser] = useState<User>({ id: '', name: '', email: '', password: '' })
     const [editMode, setEditMode] = useState(false)
+    const session = useSession()
 
     useEffect(() => {
-        accountStore.getProfile(username)
-        if (accountStore.user) {
-            setChangedUser({ id: accountStore.user.id, name: accountStore.user.name, email: accountStore.user.email, password: accountStore.user.password })
+        if (session.data && session.status === 'authenticated') {
+            accountStore.getProfile(session.data.user.name!)
+            if (accountStore.user) {
+                setChangedUser({ id: accountStore.user.id, name: accountStore.user.name, email: accountStore.user.email, password: accountStore.user.password })
+            }
         }
     }, [accountStore.user.id])
 
@@ -40,7 +39,7 @@ export default function ProfileAccount({ username, res }: ProfileProps) {
         setChangedUser({ ...changedUser, [e.target.name]: e.target.value })
     }
 
-    if (res.status !== 200 && res.status !== 404) return <ErrorPage message={'Hubo un error'} />
+    if (accountStore.error) return <ErrorPage message={accountStore.error} />
     return (
         <ProfileLayoutComponent section='Account'>
             <Typography variant='h3'>Account Info</Typography>
@@ -51,11 +50,6 @@ export default function ProfileAccount({ username, res }: ProfileProps) {
                     </Container>
                 ) : (
                     <>
-                        {
-                            accountStore.error && (
-                                <Alert variant='outlined' color='error'>{accountStore.error}</Alert>
-                            )
-                        }
                         <Grid container spacing={{ xs: 1, sm: 2, md: 2, lg: 2 }} columns={{ xs: 2, sm: 12, md: 12, lg: 12 }}>
                             <Grid item xs={6}>
                                 <TextField type={'text'} fullWidth variant='outlined' color='success' label='Username' sx={{ my: 2, input: { color: 'white', border: 1, borderRadius: 1, borderColor: 'green', fontSize: 18 }, label: { color: 'green' }, borderRadius: 1, borderColor: 'white' }}
@@ -98,7 +92,8 @@ export default function ProfileAccount({ username, res }: ProfileProps) {
                         <Typography variant='h4'>My Purchases</Typography>
                         <Container maxWidth={'md'}>
                             {
-                                res.data && (res.data as Cart[]).map((c, i) => (
+                                accountStore.user.carts
+                                && accountStore.user.carts.map((c, i) => (
                                     <Accordion sx={{ mt: 2, color: 'green', border: 1 }} key={i} TransitionProps={{ unmountOnExit: true }}>
                                         <AccordionSummary
                                             expandIcon={<ExpandMore />}
@@ -120,7 +115,7 @@ export default function ProfileAccount({ username, res }: ProfileProps) {
                                 ))
                             }
                             {
-                                res.status === 404 && (
+                                accountStore.user.carts?.length === 0 && (
                                     <Alert sx={{ mt: 3 }} variant='outlined' color='info'>
                                         You are not purchased any products
                                     </Alert>
@@ -132,23 +127,4 @@ export default function ProfileAccount({ username, res }: ProfileProps) {
             }
         </ProfileLayoutComponent>
     )
-}
-
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-    const session = await getSession(ctx)
-    if (!session) return {
-        redirect: {
-            destination: '/auth/login',
-            permanent: false
-        }
-    }
-    const res = await api.get<Response<Cart>>(`/purchases/${session.user.name}`)
-    console.log(res.data);
-
-    return {
-        props: {
-            username: session.user?.name!,
-            res: res.data
-        }
-    }
 }

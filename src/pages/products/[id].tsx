@@ -1,25 +1,28 @@
 import LayoutComponent from '@/components/LayoutComponent'
-import { api } from '@/lib/axios'
 import { Product } from '@/models/product.model'
-import { Response } from '@/models/response.model'
 import getQuantities from '@/utils/quantity'
 import { AddShoppingCartRounded } from '@mui/icons-material'
-import { Alert, Button, Card, CardActions, CardContent, Grid, MenuItem, Select, Snackbar, Typography } from '@mui/material'
-import { GetServerSideProps } from 'next'
+import { Alert, Button, Card, CardActions, CardContent, CircularProgress, Container, Grid, MenuItem, Select, Snackbar, Typography } from '@mui/material'
 import { useSession } from 'next-auth/react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import ErrorPage from '../error'
 import { useCartStore } from '@/store/productCart'
-import { log } from 'next-axiom'
+import { useProductStore } from '@/store/products'
+import { useRouter } from 'next/router'
 
-type ProductDetailsProps = {
-    res: Response<Product>
-}
-export default function ProductDetails({ res }: ProductDetailsProps) {
+
+export default function ProductDetails() {
     const [quantity, setQuantity] = useState(1)
     const cartStore = useCartStore()
     const [open, setOpen] = useState(false)
     const session = useSession()
+    const productStore = useProductStore()
+    const router = useRouter()
+    const { id } = router.query
+    useEffect(() => {
+        productStore.getProductDetail(id as string)
+    }, [])
+
 
     const handleCart = (product: Product) => {
         if (!cartStore.productCarts.find(pc => pc.product.name === product.name)) {
@@ -31,27 +34,34 @@ export default function ProductDetails({ res }: ProductDetailsProps) {
             setOpen(true)
         }
     }
-    if (res.status !== 200) return <ErrorPage message={res.error!} />
+    if (productStore.error) return <ErrorPage message={productStore.error} />
+    if (productStore.loading) return (
+        <Container maxWidth={'md'} sx={{ m: 'auto', textAlign: 'center' }}>
+            <CircularProgress size={80} color='info' />
+        </Container>
+    )
     return (
         <LayoutComponent>
             <Grid container spacing={1}>
                 <Grid item xs={8}>
-                    <img src={(res.data as Product).image}
-                        alt={(res.data as Product).name}
+                    <img src={productStore.productDetail.image}
+                        alt={productStore.productDetail.name}
                         width={'100%'}
                         height={'auto'} />
-                    <Typography variant='h3' sx={{ color: 'green' }}>{(res.data as Product).name}</Typography>
-                    <Typography variant='h5'>Category: {(res.data as Product).category?.name}</Typography>
-                    <Typography variant='body2' sx={{ mt: 5, fontStyle: 'italic', color: 'gray', fontSize: 18 }}>{(res.data as Product).description}</Typography>
+                    <Typography variant='h3' sx={{ color: 'green' }}>
+                        {productStore.productDetail.name}
+                    </Typography>
+                    <Typography variant='h5'>Category: {productStore.productDetail.category?.name}</Typography>
+                    <Typography variant='body2' sx={{ mt: 5, fontStyle: 'italic', color: 'gray', fontSize: 18 }}> {productStore.productDetail.description}</Typography>
                 </Grid>
                 <Grid item xs={4}>
                     <Card variant='outlined' sx={{ backgroundColor: 'black', borderColor: 'white', color: 'white' }}>
                         <CardContent>
                             <Typography sx={{ fontSize: 24 }}>
-                                Price: ${(res.data as Product).price}
+                                Price: ${productStore.productDetail.price}
                             </Typography>
                             <Typography sx={{ fontSize: 18 }}>
-                                Quantity: {(res.data as Product).quantity} units.
+                                Quantity: {productStore.productDetail.quantity} units.
                             </Typography>
                             <CardActions sx={{ flexDirection: 'column', alignItems: 'start' }}>
                                 <Typography sx={{ fontSize: 18 }}>Select Quantity</Typography>
@@ -66,15 +76,17 @@ export default function ProductDetails({ res }: ProductDetailsProps) {
                                     id="demo-simple-select"
                                 >
                                     {
-                                        getQuantities((res.data as Product).quantity)
+                                        getQuantities(productStore.productDetail.quantity)
                                             .map(q => (
                                                 <MenuItem value={q} key={q}>{q}</MenuItem>
                                             ))
                                     }
                                 </Select>
-                                <Typography sx={{ fontSize: 20, mt: 2 }}>SubTotal: ${(res.data as Product).price * quantity}</Typography>
+                                <Typography sx={{ fontSize: 20, mt: 2 }}>
+                                    SubTotal: ${productStore.productDetail.price * quantity}
+                                </Typography>
                                 <Button
-                                    onClick={() => handleCart(res.data as Product)}
+                                    onClick={() => handleCart(productStore.productDetail)}
                                     startIcon={<AddShoppingCartRounded />} sx={{ marginLeft: 'auto', mt: 2 }} variant='outlined' color='success'>
                                     Add to Cart
                                 </Button>
@@ -88,17 +100,6 @@ export default function ProductDetails({ res }: ProductDetailsProps) {
                     </Card>
                 </Grid>
             </Grid>
-        </LayoutComponent>
+        </LayoutComponent >
     )
-}
-
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-    log.debug("get product by id", { context: ctx })
-    const { id } = ctx.query
-    const res = await api.get<Response<Product>>(`/products/details/${id as string}`)
-    return {
-        props: {
-            res: res.data
-        }
-    }
 }

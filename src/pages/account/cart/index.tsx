@@ -2,23 +2,21 @@ import LayoutComponent from '@/components/LayoutComponent'
 import PaymentCheckout from '@/components/PaymentCheckoutComponent'
 import ProductCartComponent from '@/components/ProductCartComponent'
 import { ProductCart } from '@/models/product.model'
+import { useAccountStore } from '@/store/account'
 import { useCartStore } from '@/store/productCart'
-import { useProductStore } from '@/store/products'
 import { ShoppingCartCheckout } from '@mui/icons-material'
 import { Alert, Fab, Grid, Modal, Slide, Typography, useScrollTrigger } from '@mui/material'
 import { getSession } from 'next-auth/react'
 import { GetServerSideProps } from 'next/types'
 import React from 'react'
 
-type AccountCartProps = {
-    username: string
-}
-export default function AccountCart({ username }: AccountCartProps) {
-
+export default function AccountCart() {
     const cartStore = useCartStore()
     const deleteProduct = (productCart: ProductCart) => {
         cartStore.deleteFromCart(productCart)
     }
+    const user = useAccountStore(state => state.user)
+
     const trigger = useScrollTrigger()
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => {
@@ -63,7 +61,7 @@ export default function AccountCart({ username }: AccountCartProps) {
                             open={open}
                             onClose={handleClose}>
 
-                            <PaymentCheckout paymentMethod='' username={username} />
+                            <PaymentCheckout paymentMethod='' username={user.name} />
                         </Modal>
                     )
                 }
@@ -82,7 +80,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     }
     return {
         props: {
-            username: session.user.name
         }
     }
 }

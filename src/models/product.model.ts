@@ -25,7 +25,7 @@ export interface Cart {
     id?: string
     productCarts: ProductCart[]
     total: number
-    user: User
+    user?: User
 }
 
 export function cartConverter(cart: any): Cart {

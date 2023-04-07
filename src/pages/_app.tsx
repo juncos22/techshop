@@ -14,4 +14,3 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
     </SessionProvider>
   )
 }
-export { reportWebVitals } from 'next-axiom';

@@ -6,6 +6,7 @@ import { create } from "zustand"
 
 type ProductStates = {
     products: Product[]
+    productDetail: Product,
     paymentMethods: PaymentMethod[]
     loading: boolean
     error: string
@@ -13,6 +14,7 @@ type ProductStates = {
 
 type ProductActions = {
     loadProducts: (categoryName?: string, productName?: string) => void
+    getProductDetail: (productId: string) => void,
     getPaymentMethods: (username: string) => void
 }
 export const useProductStore = create<ProductStates & ProductActions>(
@@ -21,6 +23,13 @@ export const useProductStore = create<ProductStates & ProductActions>(
             error: "",
             loading: false,
             products: [],
+            productDetail: {
+                name: "",
+                description: "",
+                image: "",
+                price: 0,
+                quantity: 0
+            },
             paymentMethods: [],
             async loadProducts(categoryName, productName) {
                 set(state => ({
@@ -41,6 +50,23 @@ export const useProductStore = create<ProductStates & ProductActions>(
                 set(state => ({
                     loading: false,
                     products: res.data.data as Product[]
+                }))
+            },
+            async getProductDetail(productId) {
+                set(_ => ({
+                    loading: true
+                }))
+                const res = await api.get<Response<Product>>(`/products/details/${productId}`)
+                if (res.data.status !== 200) {
+                    set(_ => ({
+                        error: res.data.error,
+                        loading: false
+                    }))
+                    return
+                }
+                set(_ => ({
+                    loading: false,
+                    productDetail: res.data.data as Product
                 }))
             },
             async getPaymentMethods(username) {

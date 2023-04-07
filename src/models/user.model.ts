@@ -1,8 +1,11 @@
+import { Cart } from "./product.model"
+
 export interface User {
     id?: string
     name: string
     email?: string
-    password?: string
+    password?: string,
+    carts?: Cart[]
 }
 
 export interface PaymentMethod {
