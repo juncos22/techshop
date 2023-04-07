@@ -15,7 +15,7 @@ type CartState = {
 type CartActions = {
     addToCart: (productCart: ProductCart, username: string) => void
     deleteFromCart: (productCart: ProductCart) => void
-    makePurchase: (cart: Cart) => void
+    makePurchase: (cart: Cart, username: string) => void
 }
 
 export const useCartStore = create<CartState & CartActions>(
@@ -61,13 +61,17 @@ export const useCartStore = create<CartState & CartActions>(
                 }
             }))
         },
-        async makePurchase(cart: Cart) {
+        async makePurchase(cart: Cart, username: string) {
+            const response = await api.get<Response<User>>(`/account?name=${username}`)
             set(state => ({
                 loading: true
             }))
             const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "")
             try {
-                const res = await api.post('/stripe_sessions', cart)
+                const res = await api.post('/stripe_sessions', {
+                    cart,
+                    userId: (response.data.data as User).id
+                })
 
                 const stripe = await stripePromise
                 const { error } = await stripe?.redirectToCheckout({ sessionId: res.data.session.id })!

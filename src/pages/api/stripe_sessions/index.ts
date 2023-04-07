@@ -14,13 +14,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
         });
         if (req.method === 'POST') {
-            const cart = req.body as Cart
+            const { cart, userId } = req.body
 
             const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
                 apiVersion: "2022-11-15"
             })
 
-            cart.productCarts.map(async pc => {
+            cart.productCarts.map(async (pc: ProductCart) => {
                 const product = await stripe.products.create({
                     name: pc.product.name,
                     images: [pc.product.image],
@@ -58,10 +58,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const createdCart = await db.cart.create({
                 data: {
                     total: cart.total,
-                    userId: cart.user?.id!,
+                    userId: userId,
                     productCarts: {
                         createMany: {
-                            data: cart.productCarts.map(pc => ({
+                            data: cart.productCarts.map((pc: ProductCart) => ({
                                 productId: pc.product.id!,
                                 quantity: pc.quantity,
                                 subtotal: pc.subtotal,

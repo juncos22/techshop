@@ -4,6 +4,8 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { CircularProgress, Alert, Container } from '@mui/material';
 import { useCartStore } from '@/store/productCart';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -40,10 +42,16 @@ function PaymentDetails() {
 
 export default function PaymentCheckout() {
     const cartStore = useCartStore()
+    const session = useSession()
+    const router = useRouter()
 
     const finishCheckOut = async () => {
         // console.log(cartStore.cart);
-        cartStore.makePurchase(cartStore.cart)
+        if (session.status === 'authenticated') {
+            cartStore.makePurchase(cartStore.cart, session.data.user.name!)
+        } else {
+            router.push('/auth/login')
+        }
     }
 
     return (
