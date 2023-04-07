@@ -2,20 +2,19 @@ import LayoutComponent from '@/components/LayoutComponent'
 import PaymentCheckout from '@/components/PaymentCheckoutComponent'
 import ProductCartComponent from '@/components/ProductCartComponent'
 import { ProductCart } from '@/models/product.model'
-import { useAccountStore } from '@/store/account'
 import { useCartStore } from '@/store/productCart'
 import { ShoppingCartCheckout } from '@mui/icons-material'
 import { Alert, Fab, Grid, Modal, Slide, Typography, useScrollTrigger } from '@mui/material'
-import { getSession } from 'next-auth/react'
-import { GetServerSideProps } from 'next/types'
-import React from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/router'
+import React, { useEffect } from 'react'
 
 export default function AccountCart() {
     const cartStore = useCartStore()
     const deleteProduct = (productCart: ProductCart) => {
         cartStore.deleteFromCart(productCart)
     }
-    const user = useAccountStore(state => state.user)
+    const session = useSession()
 
     const trigger = useScrollTrigger()
     const [open, setOpen] = React.useState(false);
@@ -23,6 +22,13 @@ export default function AccountCart() {
         setOpen(true);
     }
     const handleClose = () => setOpen(false);
+    const router = useRouter()
+
+    useEffect(() => {
+        if (session.status === 'unauthenticated') {
+            router.push('/auth/login')
+        }
+    }, [])
     return (
         <LayoutComponent>
             <>
@@ -60,26 +66,12 @@ export default function AccountCart() {
                         <Modal
                             open={open}
                             onClose={handleClose}>
-
-                            <PaymentCheckout paymentMethod='' username={user.name} />
+                            <PaymentCheckout paymentMethod=''
+                                username={session.data?.user.name!} />
                         </Modal>
                     )
                 }
             </>
         </LayoutComponent>
     )
-}
-
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-    const session = await getSession(ctx)
-    if (!session) return {
-        redirect: {
-            destination: '/auth/login',
-            permanent: false
-        }
-    }
-    return {
-        props: {
-        }
-    }
 }
