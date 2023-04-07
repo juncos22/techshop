@@ -48,7 +48,17 @@ export const useCartStore = create<CartState & CartActions>(
         },
         deleteFromCart(productCart) {
             set(state => ({
-                productCarts: state.productCarts.filter(pc => pc.product.name !== productCart.product.name)
+                productCarts: state.productCarts.filter(pc => pc.product.id !== productCart.product.id),
+                cart: {
+                    productCarts: state.productCarts.filter(pc => pc.product.id !== productCart.product.id),
+                    total: 0
+                }
+            }))
+            set(state => ({
+                cart: {
+                    productCarts: state.productCarts.filter(pc => pc.product.id !== productCart.product.id),
+                    total: state.productCarts.map(pc => pc.subtotal).reduce((acc, i) => acc + i)
+                }
             }))
         },
         async makePurchase(cart: Cart) {
