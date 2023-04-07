@@ -55,49 +55,54 @@ export default function ProductDetails() {
                     <Typography variant='body2' sx={{ mt: 5, fontStyle: 'italic', color: 'gray', fontSize: 18 }}> {productStore.productDetail.description}</Typography>
                 </Grid>
                 <Grid item xs={4}>
-                    <Card variant='outlined' sx={{ backgroundColor: 'black', borderColor: 'white', color: 'white' }}>
-                        <CardContent>
-                            <Typography sx={{ fontSize: 24 }}>
-                                Price: ${productStore.productDetail.price}
-                            </Typography>
-                            <Typography sx={{ fontSize: 18 }}>
-                                Quantity: {productStore.productDetail.quantity} units.
-                            </Typography>
-                            <CardActions sx={{ flexDirection: 'column', alignItems: 'start' }}>
-                                <Typography sx={{ fontSize: 18 }}>Select Quantity</Typography>
-                                <Select
-                                    sx={{ color: 'white', border: 1, borderColor: 'white' }}
-                                    variant='outlined'
-                                    fullWidth
-                                    name='quantity'
-                                    value={quantity}
-                                    onChange={(e) => setQuantity(Number(e.target.value))}
-                                    labelId="demo-simple-select-label"
-                                    id="demo-simple-select"
-                                >
-                                    {
-                                        getQuantities(productStore.productDetail.quantity)
-                                            .map(q => (
-                                                <MenuItem value={q} key={q}>{q}</MenuItem>
-                                            ))
-                                    }
-                                </Select>
-                                <Typography sx={{ fontSize: 20, mt: 2 }}>
-                                    SubTotal: ${productStore.productDetail.price * quantity}
-                                </Typography>
-                                <Button
-                                    onClick={() => handleCart(productStore.productDetail)}
-                                    startIcon={<AddShoppingCartRounded />} sx={{ marginLeft: 'auto', mt: 2 }} variant='outlined' color='success'>
-                                    Add to Cart
-                                </Button>
-                            </CardActions>
-                            <Snackbar anchorOrigin={{ vertical: "bottom", horizontal: "right" }} open={open} autoHideDuration={2000} onClose={() => setOpen(false)}>
-                                <Alert onClose={() => setOpen(false)} severity="success" sx={{ width: 'auto' }}>
-                                    Product Added to Cart!
-                                </Alert>
-                            </Snackbar>
-                        </CardContent>
-                    </Card>
+                    {
+                        session.status === 'authenticated'
+                        && (
+                            <Card variant='outlined' sx={{ backgroundColor: 'black', borderColor: 'white', color: 'white' }}>
+                                <CardContent>
+                                    <Typography sx={{ fontSize: 24 }}>
+                                        Price: ${productStore.productDetail.price}
+                                    </Typography>
+                                    <Typography sx={{ fontSize: 18 }}>
+                                        Quantity: {productStore.productDetail.quantity} units.
+                                    </Typography>
+                                    <CardActions sx={{ flexDirection: 'column', alignItems: 'start' }}>
+                                        <Typography sx={{ fontSize: 18 }}>Select Quantity</Typography>
+                                        <Select
+                                            sx={{ color: 'white', border: 1, borderColor: 'white' }}
+                                            variant='outlined'
+                                            fullWidth
+                                            name='quantity'
+                                            value={quantity}
+                                            onChange={(e) => setQuantity(Number(e.target.value))}
+                                            labelId="demo-simple-select-label"
+                                            id="demo-simple-select"
+                                        >
+                                            {
+                                                getQuantities(productStore.productDetail.quantity)
+                                                    .map(q => (
+                                                        <MenuItem value={q} key={q}>{q}</MenuItem>
+                                                    ))
+                                            }
+                                        </Select>
+                                        <Typography sx={{ fontSize: 20, mt: 2 }}>
+                                            SubTotal: ${productStore.productDetail.price * quantity}
+                                        </Typography>
+                                        <Button
+                                            onClick={() => handleCart(productStore.productDetail)}
+                                            startIcon={<AddShoppingCartRounded />} sx={{ marginLeft: 'auto', mt: 2 }} variant='outlined' color='success'>
+                                            Add to Cart
+                                        </Button>
+                                    </CardActions>
+                                    <Snackbar anchorOrigin={{ vertical: "bottom", horizontal: "right" }} open={open} autoHideDuration={2000} onClose={() => setOpen(false)}>
+                                        <Alert onClose={() => setOpen(false)} severity="success" sx={{ width: 'auto' }}>
+                                            Product Added to Cart!
+                                        </Alert>
+                                    </Snackbar>
+                                </CardContent>
+                            </Card>
+                        )
+                    }
                 </Grid>
             </Grid>
         </LayoutComponent >

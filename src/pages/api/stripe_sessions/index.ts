@@ -36,7 +36,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             const params: Stripe.Checkout.SessionCreateParams = {
                 submit_type: 'donate',
-                payment_method_types: ['card', 'customer_balance', 'us_bank_account'],
+                payment_method_types: ['card'],
                 mode: 'payment',
                 line_items: cart.productCarts.map((pc: ProductCart) => ({
                     price_data: {

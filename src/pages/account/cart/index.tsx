@@ -66,8 +66,7 @@ export default function AccountCart() {
                         <Modal
                             open={open}
                             onClose={handleClose}>
-                            <PaymentCheckout paymentMethod=''
-                                username={session.data?.user.name!} />
+                            <PaymentCheckout />
                         </Modal>
                     )
                 }
