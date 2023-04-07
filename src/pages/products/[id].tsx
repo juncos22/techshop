@@ -10,6 +10,7 @@ import { useSession } from 'next-auth/react'
 import React, { useState } from 'react'
 import ErrorPage from '../error'
 import { useCartStore } from '@/store/productCart'
+import { log } from 'next-axiom'
 
 type ProductDetailsProps = {
     res: Response<Product>
@@ -92,6 +93,7 @@ export default function ProductDetails({ res }: ProductDetailsProps) {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
+    log.debug("get product by id", { context: ctx })
     const { id } = ctx.query
     const res = await api.get<Response<Product>>(`/products/details/${id as string}`)
     return {
