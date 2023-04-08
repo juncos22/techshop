@@ -26,8 +26,6 @@ export default function AccountCart() {
     const handleClose = () => setOpen(false);
     const router = useRouter()
 
-
-
     useEffect(() => {
         if (session.status === 'unauthenticated') {
             router.push('/auth/login')
@@ -45,6 +43,7 @@ export default function AccountCart() {
                         </Alert>
                     )
                 }
+
                 <Slide in={!trigger}>
                     <Grid container spacing={1} columns={{ xs: 2, sm: 12, md: 12, lg: 12 }}>
                         {

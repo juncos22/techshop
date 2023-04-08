@@ -18,7 +18,7 @@ type CartState = {
 type CartActions = {
     addToCart: (productCart: ProductCart, username: string) => void
     deleteFromCart: (productCart: ProductCart) => void
-    makePurchase: (cart: Cart) => void
+    makePurchase: (cart: Cart, paymentMethodId: string) => void
 }
 
 export const useCartStore = create<CartState & CartActions>(
@@ -64,25 +64,30 @@ export const useCartStore = create<CartState & CartActions>(
                 }
             }))
         },
-        async makePurchase(cart: Cart) {
+        async makePurchase(cart: Cart, paymentMethodId) {
             try {
                 // const response = await api.get<Response<User>>(`/account?name=${username}`)
                 set(state => ({
                     ...state,
                     loading: true
                 }))
-                const res = await api.post('/payment', cart)
+                const res = await api.post('/payment', {
+                    cart,
+                    paymentMethodId
+                })
 
-                if (res.status === 200 && res.data) {
-                    set(state => {
-                        state.loading = false
-                        state.payment = res.data as PaymentIntent
-                        state.cart = {
-                            total: 0,
-                            productCarts: []
+                if (res.status === 200) {
+                    set(state => (
+                        {
+                            ...state,
+                            loading: false,
+                            payment: res.data as PaymentIntent,
+                            cart: {
+                                total: 0,
+                                productCarts: []
+                            }
                         }
-                        return state
-                    })
+                    ))
                 } else {
                     set(state => ({
                         loading: false,

@@ -1,18 +1,10 @@
 import LayoutComponent from '@/components/LayoutComponent'
 import { Box, Container, Slide, Typography, useScrollTrigger } from '@mui/material'
-import { useRouter } from 'next/router'
-import React, { useEffect } from 'react'
+import React from 'react'
 
 export default function ResultPage() {
     const trigger = useScrollTrigger()
-    const router = useRouter()
-    useEffect(() => {
-        // setTimeout(() => {
-        //     if (router.isReady) {
-        //         router.push('/')
-        //     }
-        // }, 3000);
-    }, [])
+
     return (
         <LayoutComponent>
             <Container maxWidth={'md'}>
@@ -22,7 +14,7 @@ export default function ResultPage() {
                             Thanks for Purchasing!
                         </Typography>
                         <Typography variant='body1' sx={{ color: 'green' }}>
-                            You will be redirected to home
+                            You can go home
                         </Typography>
                     </Box>
                 </Slide>

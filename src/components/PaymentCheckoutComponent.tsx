@@ -55,41 +55,31 @@ export default function PaymentCheckout({ onCancel }: PaymentCheckoutProps) {
 
     const createPayment = async () => {
         if (session.status === 'authenticated') {
-            cartStore.makePurchase(cartStore.cart)
-            console.log(cartStore.payment);
-
-            if (!cartStore.loading && cartStore.payment) {
-                await confirmPayment(cartStore.payment.client_secret!)
+            if (stripe && elements) {
+                const result = await stripe.createPaymentMethod({
+                    type: "card",
+                    card: elements.getElement(CardElement)!,
+                    billing_details: {
+                        name: session.data.user.name,
+                        email: session.data.user.email
+                    },
+                })
+                console.log(result);
+                cartStore.makePurchase(cartStore.cart, result.paymentMethod?.id!)
+                if (!cartStore.error) {
+                    onCancel()
+                }
             }
         } else {
             router.push('/auth/login')
         }
     }
-    const confirmPayment = async (clientSecret: string) => {
-        if (stripe) {
-            const result = await stripe.confirmCardPayment(clientSecret, {
-                payment_method: {
-                    card: elements?.getElement(CardElement)!,
-                    billing_details: {
-                        email: session.data?.user.email,
-                        name: session.data?.user.name
-                    }
-                }
-            })
-            console.log(result);
-            if (result?.paymentIntent?.status === 'succeeded') {
-                router.push('/result')
-            }
-        }
-    }
+
     return (
         <Box sx={style}>
             <>
                 <PaymentDetails />
                 <CardElement options={cardStyle} id='card-element' />
-                {
-                    cartStore.error && <Alert color='error'>{cartStore.error}</Alert>
-                }
                 {
                     cartStore.loading ? (
                         <Container maxWidth={'sm'} sx={{ textAlign: 'center' }}>
@@ -105,6 +95,9 @@ export default function PaymentCheckout({ onCancel }: PaymentCheckoutProps) {
                             </Button>
                         </Container>
                     )
+                }
+                {
+                    cartStore.error && <Alert color='error'>{cartStore.error}</Alert>
                 }
             </>
         </Box>
