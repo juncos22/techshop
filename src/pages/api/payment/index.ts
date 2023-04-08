@@ -1,6 +1,6 @@
 
 import { db } from "@/lib/prisma";
-import { Cart, ProductCart } from "@/models/product.model";
+import { ProductCart } from "@/models/product.model";
 import { NextApiRequest, NextApiResponse } from "next";
 import NextCors from "nextjs-cors";
 import { Stripe } from "stripe";
@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await NextCors(req, res, {
             // Options
             methods: ['POST'],
-            origin: [process.env.NEXTAUTH_URL, "https://r.stripe.com/0"],
+            origin: process.env.NEXTAUTH_URL,
             optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
         });
 
