@@ -66,9 +66,11 @@ export default function PaymentCheckout({ onCancel }: PaymentCheckoutProps) {
                 })
                 console.log(result);
                 cartStore.makePurchase(cartStore.cart, result.paymentMethod?.id!)
-                if (!cartStore.error) {
-                    onCancel()
-                }
+                setTimeout(() => {
+                    if (!cartStore.error) {
+                        onCancel()
+                    }
+                }, 2000);
             }
         } else {
             router.push('/auth/login')
