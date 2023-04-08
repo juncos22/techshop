@@ -4,10 +4,12 @@ import ProductCartComponent from '@/components/ProductCartComponent'
 import { ProductCart } from '@/models/product.model'
 import { useCartStore } from '@/store/productCart'
 import { ShoppingCartCheckout } from '@mui/icons-material'
-import { Alert, Fab, Grid, Modal, Slide, Typography, useScrollTrigger } from '@mui/material'
+import { Alert, Button, CircularProgress, Container, Fab, Grid, Modal, Slide, Typography, useScrollTrigger } from '@mui/material'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import React, { useEffect } from 'react'
+import { CardElement } from "@stripe/react-stripe-js";
+import { StripeCardElement } from '@stripe/stripe-js'
 
 export default function AccountCart() {
     const cartStore = useCartStore()
@@ -23,6 +25,8 @@ export default function AccountCart() {
     }
     const handleClose = () => setOpen(false);
     const router = useRouter()
+
+
 
     useEffect(() => {
         if (session.status === 'unauthenticated') {
@@ -66,7 +70,7 @@ export default function AccountCart() {
                         <Modal
                             open={open}
                             onClose={handleClose}>
-                            <PaymentCheckout />
+                            <PaymentCheckout onCancel={handleClose} />
                         </Modal>
                     )
                 }
@@ -74,3 +78,4 @@ export default function AccountCart() {
         </LayoutComponent>
     )
 }
+

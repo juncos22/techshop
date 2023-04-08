@@ -2,7 +2,9 @@ import { api } from "@/lib/axios"
 import { Cart, ProductCart } from "@/models/product.model"
 import { Response } from "@/models/response.model"
 import { User } from "@/models/user.model"
-import { loadStripe } from "@stripe/stripe-js"
+import { useStripe } from "@stripe/react-stripe-js"
+import { PaymentIntent, loadStripe } from "@stripe/stripe-js"
+import { useSession } from "next-auth/react"
 import { create } from "zustand"
 
 type CartState = {
@@ -10,12 +12,13 @@ type CartState = {
     cart: Cart
     error: string
     loading: boolean
+    payment?: PaymentIntent
 }
 
 type CartActions = {
     addToCart: (productCart: ProductCart, username: string) => void
     deleteFromCart: (productCart: ProductCart) => void
-    makePurchase: (cart: Cart, username: string) => void
+    makePurchase: (cart: Cart) => void
 }
 
 export const useCartStore = create<CartState & CartActions>(
@@ -57,30 +60,35 @@ export const useCartStore = create<CartState & CartActions>(
             set(state => ({
                 cart: {
                     productCarts: state.productCarts.filter(pc => pc.product.id !== productCart.product.id),
-                    total: state.productCarts.map(pc => pc.subtotal).reduce((acc, i) => acc + i)
+                    total: state.productCarts.length ? state.productCarts.map(pc => pc.subtotal).reduce((acc, i) => acc + i) : 0
                 }
             }))
         },
-        async makePurchase(cart: Cart, username: string) {
-            const response = await api.get<Response<User>>(`/account?name=${username}`)
-            set(state => ({
-                loading: true
-            }))
-            const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "")
+        async makePurchase(cart: Cart) {
             try {
-                const res = await api.post('/stripe_sessions', {
-                    cart,
-                    userId: (response.data.data as User).id
-                })
-
-                const stripe = await stripePromise
-                const { error } = await stripe?.redirectToCheckout({ sessionId: res.data.session.id })!
-                console.log(error);
-
+                // const response = await api.get<Response<User>>(`/account?name=${username}`)
                 set(state => ({
-                    error: error.message,
-                    loading: false
+                    ...state,
+                    loading: true
                 }))
+                const res = await api.post('/payment', cart)
+
+                if (res.status === 200 && res.data) {
+                    set(state => {
+                        state.loading = false
+                        state.payment = res.data as PaymentIntent
+                        state.cart = {
+                            total: 0,
+                            productCarts: []
+                        }
+                        return state
+                    })
+                } else {
+                    set(state => ({
+                        loading: false,
+                        error: "Could not made the purchase"
+                    }))
+                }
             } catch (error: any) {
                 console.log(error);
                 set(state => ({
@@ -88,6 +96,6 @@ export const useCartStore = create<CartState & CartActions>(
                     loading: false
                 }))
             }
-        },
+        }
     })
 )

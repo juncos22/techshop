@@ -14,6 +14,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         });
         const { id } = req.query
         const product = await db.product.findUnique({
+            include: {
+                category: true,
+            },
             where: {
                 id: id as string
             }

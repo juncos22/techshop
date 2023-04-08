@@ -2,3 +2,16 @@ body {
   background-color: black;
   color: #f9f9f9;
 }
+
+#card-element {
+  border-radius: 0.5rem;
+  padding: 12px;
+  border: 1px solid rgba(50, 50, 93, 0.1);
+  max-height: 44px;
+  width: 100%;
+  margin: 'auto';
+  text-align: center;
+  background: #f9f9f9;
+  box-sizing: border-box;
+  color: '#212121';
+}

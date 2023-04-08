@@ -10,25 +10,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model PaymentInfo {
-  id          String @id @default(auto()) @map("_id") @db.ObjectId
-  cardNumber  String
-  nameOnCard  String
-  cardCode    Int
-  address     String
-  expireMonth Int
-  expireYear  Int
-  userCard    User   @relation(fields: [userCardId], references: [id])
-  userCardId  String @db.ObjectId
-}
-
 model User {
-  id           String        @id @default(auto()) @map("_id") @db.ObjectId
-  username     String
-  email        String
-  password     String
-  carts        Cart[]
-  paymentsInfo PaymentInfo[]
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  username String
+  email    String
+  password String
+  carts    Cart[]
 }
 
 model Product {

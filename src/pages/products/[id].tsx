@@ -63,8 +63,12 @@ export default function ProductDetails() {
                                     <Typography sx={{ fontSize: 24 }}>
                                         Price: ${productStore.productDetail.price}
                                     </Typography>
-                                    <Typography sx={{ fontSize: 18 }}>
-                                        Quantity: {productStore.productDetail.quantity} units.
+                                    <Typography sx={{ fontSize: 18, color: productStore.productDetail.quantity > 0 ? 'white' : 'red' }}>
+                                        {
+                                            productStore.productDetail.quantity > 0 ? (
+                                                `Quantity: ${productStore.productDetail.quantity} units.`
+                                            ) : "Out of Stock"
+                                        }
                                     </Typography>
                                     <CardActions sx={{ flexDirection: 'column', alignItems: 'start' }}>
                                         <Typography sx={{ fontSize: 18 }}>Select Quantity</Typography>
@@ -72,6 +76,7 @@ export default function ProductDetails() {
                                             sx={{ color: 'white', border: 1, borderColor: 'white' }}
                                             variant='outlined'
                                             fullWidth
+                                            disabled={productStore.productDetail.quantity === 0}
                                             name='quantity'
                                             value={quantity}
                                             onChange={(e) => setQuantity(Number(e.target.value))}
@@ -89,6 +94,7 @@ export default function ProductDetails() {
                                             SubTotal: ${productStore.productDetail.price * quantity}
                                         </Typography>
                                         <Button
+                                            disabled={productStore.productDetail.quantity === 0}
                                             onClick={() => handleCart(productStore.productDetail)}
                                             startIcon={<AddShoppingCartRounded />} sx={{ marginLeft: 'auto', mt: 2 }} variant='outlined' color='success'>
                                             Add to Cart
