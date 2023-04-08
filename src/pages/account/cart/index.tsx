@@ -4,12 +4,11 @@ import ProductCartComponent from '@/components/ProductCartComponent'
 import { ProductCart } from '@/models/product.model'
 import { useCartStore } from '@/store/productCart'
 import { ShoppingCartCheckout } from '@mui/icons-material'
-import { Alert, Button, CircularProgress, Container, Fab, Grid, Modal, Slide, Typography, useScrollTrigger } from '@mui/material'
+import { Alert, Fab, Grid, Modal, Slide, Typography, useScrollTrigger } from '@mui/material'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
-import React, { useEffect } from 'react'
-import { CardElement } from "@stripe/react-stripe-js";
-import { StripeCardElement } from '@stripe/stripe-js'
+import React, { useEffect, useState } from 'react'
+import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 
 export default function AccountCart() {
     const cartStore = useCartStore()
@@ -19,12 +18,40 @@ export default function AccountCart() {
     const session = useSession()
 
     const trigger = useScrollTrigger()
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
     const handleOpen = () => {
         setOpen(true);
     }
     const handleClose = () => setOpen(false);
     const router = useRouter()
+    const stripe = useStripe()
+    const elements = useElements()
+    const [message, setMessage] = useState("")
+
+    const createPayment = async () => {
+        if (session.status === 'authenticated') {
+            if (stripe && elements) {
+                const result = await stripe.createPaymentMethod({
+                    type: "card",
+                    card: elements.getElement(CardElement)!,
+                    billing_details: {
+                        name: session.data.user.name,
+                        email: session.data.user.email
+                    },
+                })
+                // console.log(result);
+                cartStore.makePurchase(cartStore.cart, result.paymentMethod?.id!)
+                setTimeout(() => {
+                    if (!cartStore.error) {
+                        handleClose()
+                        setMessage("Payment succeeded")
+                    }
+                }, 2000);
+            }
+        } else {
+            router.push('/auth/login')
+        }
+    }
 
     useEffect(() => {
         if (session.status === 'unauthenticated') {
@@ -43,7 +70,9 @@ export default function AccountCart() {
                         </Alert>
                     )
                 }
-
+                {
+                    message && <Alert sx={{ mt: 2 }} color='success' variant='outlined'>{message}</Alert>
+                }
                 <Slide in={!trigger}>
                     <Grid container spacing={1} columns={{ xs: 2, sm: 12, md: 12, lg: 12 }}>
                         {
@@ -64,15 +93,13 @@ export default function AccountCart() {
                     )
                 }
 
-                {
-                    open && (
-                        <Modal
-                            open={open}
-                            onClose={handleClose}>
-                            <PaymentCheckout onCancel={handleClose} />
-                        </Modal>
-                    )
-                }
+                <Modal
+                    open={open}
+                    onClose={handleClose}>
+                    <PaymentCheckout
+                        onCancel={handleClose}
+                        onComplete={createPayment} />
+                </Modal>
             </>
         </LayoutComponent>
     )

@@ -45,43 +45,22 @@ function PaymentDetails() {
 
 type PaymentCheckoutProps = {
     onCancel: () => void
+    onComplete: () => void
 }
-export default function PaymentCheckout({ onCancel }: PaymentCheckoutProps) {
+export default function PaymentCheckout({ onCancel, onComplete }: PaymentCheckoutProps) {
     const cartStore = useCartStore()
     const session = useSession()
     const router = useRouter()
-    const stripe = useStripe()
-    const elements = useElements()
 
-    const createPayment = async () => {
-        if (session.status === 'authenticated') {
-            if (stripe && elements) {
-                const result = await stripe.createPaymentMethod({
-                    type: "card",
-                    card: elements.getElement(CardElement)!,
-                    billing_details: {
-                        name: session.data.user.name,
-                        email: session.data.user.email
-                    },
-                })
-                console.log(result);
-                cartStore.makePurchase(cartStore.cart, result.paymentMethod?.id!)
-                setTimeout(() => {
-                    if (!cartStore.error) {
-                        onCancel()
-                    }
-                }, 2000);
-            }
-        } else {
-            router.push('/auth/login')
-        }
-    }
+    const [formComplete, setFormComplete] = React.useState(false)
+
+
 
     return (
         <Box sx={style}>
             <>
                 <PaymentDetails />
-                <CardElement options={cardStyle} id='card-element' />
+                <CardElement onChange={(e) => setFormComplete((_) => e.complete)} options={cardStyle} id='card-element' />
                 {
                     cartStore.loading ? (
                         <Container maxWidth={'sm'} sx={{ textAlign: 'center' }}>
@@ -92,7 +71,7 @@ export default function PaymentCheckout({ onCancel }: PaymentCheckoutProps) {
                             <Button onClick={onCancel} disabled={cartStore.loading} variant='outlined' sx={{ mr: 1 }}>
                                 Cancel
                             </Button>
-                            <Button variant='contained' disabled={cartStore.loading} sx={{ ml: 1 }} startIcon={<PaymentRounded />} onClick={createPayment}>
+                            <Button variant='contained' disabled={cartStore.loading || !formComplete} sx={{ ml: 1 }} startIcon={<PaymentRounded />} onClick={onComplete}>
                                 Finish Checkout
                             </Button>
                         </Container>

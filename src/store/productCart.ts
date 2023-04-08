@@ -2,9 +2,7 @@ import { api } from "@/lib/axios"
 import { Cart, ProductCart } from "@/models/product.model"
 import { Response } from "@/models/response.model"
 import { User } from "@/models/user.model"
-import { useStripe } from "@stripe/react-stripe-js"
-import { PaymentIntent, loadStripe } from "@stripe/stripe-js"
-import { useSession } from "next-auth/react"
+import { PaymentIntent } from "@stripe/stripe-js"
 import { create } from "zustand"
 
 type CartState = {
@@ -85,7 +83,8 @@ export const useCartStore = create<CartState & CartActions>(
                             cart: {
                                 total: 0,
                                 productCarts: []
-                            }
+                            },
+                            productCarts: []
                         }
                     ))
                 } else {
